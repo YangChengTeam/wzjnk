@@ -1,0 +1,23 @@
+<resources>
+
+    <style name="WhiteBaseTheme" parent="@android:style/Theme.Light" />
+    <style name="BlackBaseTheme" parent="@android:style/Theme.Light" />
+    <style name="WhiteTheme" parent="@style/WhiteBaseTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="BlackTheme" parent="@style/BlackBaseTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="ClassicTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+    <style name="StartTheme">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+</resources>
