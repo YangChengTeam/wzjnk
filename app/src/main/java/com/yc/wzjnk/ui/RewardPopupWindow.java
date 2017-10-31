@@ -100,7 +100,8 @@ public class RewardPopupWindow extends BasePopupWindow {
                     try {
                         rewardPrice = Integer.parseInt(s.toString());
                         if (rewardPrice > 888) {
-                            ToastUtil.toast(mContext, "输入的金额不符合要求");
+                            etPrice.setText(s.subSequence(0, s.length() - 1));
+                            ToastUtil.toast2(mContext, "输入的金额不符合要求");
                             return;
                         }
                         tvRewardMoney.setText(rewardPrice + "元");

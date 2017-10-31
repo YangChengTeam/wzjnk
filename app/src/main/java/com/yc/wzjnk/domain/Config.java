@@ -41,6 +41,7 @@ public class Config {
     public static final String PAY_WAY_LIST_URL = getBaseUrl() + "index/payway_list" + APPID;
     public static final String TYPE_LIST_URL = getBaseUrl() + "index/vip_flag_list" + APPID;
     public static final String VIP_LIST2_URL = getBaseUrl() + "index/vip_list2" + APPID;
+
     public static String getBaseUrl() {
         return (DEBUG ? debugBaseUrl : baseUrl);
     }

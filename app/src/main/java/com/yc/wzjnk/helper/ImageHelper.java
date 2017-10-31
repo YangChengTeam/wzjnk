@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.kk.utils.PathUtil;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
+import com.umeng.analytics.MobclickAgent;
 import com.yc.wzjnk.domain.Config;
 import com.yc.wzjnk.domain.GoodInfo;
 import com.yc.wzjnk.ui.MainActivity;
@@ -75,14 +77,11 @@ public class ImageHelper {
     }
 
     public void recyleBimaps() {
-        for (Bitmap bmp : pics) {
-            if (!bmp.isRecycled()) {
-                try {
-                    bmp.recycle();
-                } catch (Exception e) {
-                }
-            }
-        }
+//        for (Bitmap bmp : pics) {
+//            if (!bmp.isRecycled()) {
+//                bmp.recycle();
+//            }
+//        }
         pics.clear();
     }
 
@@ -157,23 +156,27 @@ public class ImageHelper {
             public void run() {
                 Picasso picasso = Picasso.with(context);
 //                picasso.setIndicatorsEnabled(true);
+
                 if (assetsFiles != null && assetsFiles.contains(name)) {
                     goodInfo.setIs_download(true);
-                    picasso.load("file:///android_asset/" + name).resize(ScreenUtil.dip2px(context, 115), ScreenUtil
-                            .dip2px
-                                    (context, 64)).into(imageView);
+                    picasso.load("file:///android_asset/" + name).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                            .resize(ScreenUtil.dip2px(context, 115),
+                                    ScreenUtil
+                                            .dip2px
+                                                    (context, 64)).into(imageView);
                 } else {
                     File file = new File(dir + "/" + name);
                     if (file.exists()) {
-                        picasso.load(file).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
+                        picasso.load(file).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
                                 (context, 64)).into(imageView);
                         goodInfo.setIs_download(true);
                     } else {
-                        picasso.load(iconName).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
+                        picasso.load(iconName).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
                                 (context, 64)).into(imageView);
                     }
                 }
             }
+
         });
     }
 
@@ -306,8 +309,7 @@ public class ImageHelper {
     }
 
     ///< 从文件获取字符串
-    public String readInfo(String name) {
-        File file = new File(name);
+    public String readInfo(File file) {
         if (file.exists()) {
             StringBuilder text = new StringBuilder();
             try {
@@ -331,8 +333,13 @@ public class ImageHelper {
         if (!iconName.equals(Config.DEFAULT_ICON)) {
             intName = getIconIntName(iconName);
         }
-        String name = dir + "/" + intName + ".time";
-        String timeStr = readInfo(name);
+        String url = getUrl(iconName);
+        String fileName = dir + "/" + intName + ".time";
+        File file = new File(fileName);
+        if (!file.exists()) {
+            download(url + "/" + intName + ".time", fileName);
+        }
+        String timeStr = readInfo(file);
         if (timeStr == null || timeStr.isEmpty()) {
             return integers;
         }

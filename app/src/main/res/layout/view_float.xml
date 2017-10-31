@@ -3,7 +3,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-    <com.yc.wzjnk.ui.FloatImageView
+    <com.yc.wzjnk.ui.RecyclerImageView
         android:id="@+id/iv_float"
         android:layout_width="50dp"
         android:layout_height="50dp"

@@ -37,7 +37,7 @@ public class SkillBoxView {
     private LayoutInflater mInflater;
 
     private RelativeLayout mFloatLayout;
-    private FloatImageView mFloatView;
+    private ImageView mFloatView;
     private int mFloatViewWidth;
     private boolean isClick = true;
 
@@ -103,7 +103,6 @@ public class SkillBoxView {
 
             if (moveParams == null) {
                 moveParams = new WindowManager.LayoutParams();
-                moveParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
                 moveParams.format = PixelFormat.RGBA_8888;
                 moveParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
                 moveParams.gravity = Gravity.LEFT | Gravity.TOP;
@@ -118,7 +117,7 @@ public class SkillBoxView {
         mFloatLayout = (RelativeLayout) mInflater
                 .inflate(R.layout.view_float, null);
         mWindowManager.addView(mFloatLayout, originParams);
-        mFloatView = (FloatImageView) mFloatLayout.findViewById(R.id.iv_float);
+        mFloatView = (ImageView) mFloatLayout.findViewById(R.id.iv_float);
         showOff();
         mFloatView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -273,7 +272,7 @@ public class SkillBoxView {
     private View.OnClickListener onclick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v.getId() == mFloatView.getId()) {
+            if (mFloatView != null && v.getId() == mFloatView.getId()) {
                 if (isClick) {
                     isOpen = !isOpen;
                     if (isOpen) {

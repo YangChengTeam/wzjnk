@@ -22,13 +22,15 @@ public class ProActivity extends Activity {
         if (Intent.ACTION_VIEW.equals(action)) {
             Uri uri = intent.getData();
             if (uri != null) {
-                // king://xxxx/weixin?data=xxxx
+                // king://xxxx/xx?data=xxxx
                 String host = uri.getHost();
                 if (host.equals("public")) {
                     WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.getMainActivity(), Config.WEIXIN_JUMP_URL);
                     webPopupWindow.show(MainActivity.getMainActivity().getWindow().getDecorView().getRootView());
                 } else if (host.equals("download")) {
-                    AppUtil.openWxShareText(this, uri.getQueryParameter("data"));
+                    AppUtil.openWxShareText(MainActivity.getMainActivity(), uri.getQueryParameter("data"));
+                } else if (host.equals("qq")) {
+                    AppUtil.gotoQQ(MainActivity.getMainActivity(), Config.QQ);
                 }
                 finish();
             }

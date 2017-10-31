@@ -202,12 +202,7 @@ public class MainActivity extends FragmentActivity {
                     if (vipInfoList != null && vipInfoList.size() > 0) {
                         Config.QQ = Config.VIP_QQ;
                     }
-                    try {
-                        String url = "mqqwpa://im/chat?chat_type=wpa&uin=" + Config.QQ;
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
-                    } catch (Exception e) {
-                        Toast.makeText(MainActivity.this, "手机QQ未安装或该版本不支持", Toast.LENGTH_SHORT).show();
-                    }
+                    AppUtil.gotoQQ(MainActivity.this, Config.QQ);
                 } else {
                     Toast.makeText(MainActivity.this, "手机QQ未安装或该版本不支持", Toast.LENGTH_SHORT).show();
                 }
@@ -241,7 +236,7 @@ public class MainActivity extends FragmentActivity {
                 String html = "<font color='red'>**注意**<br/>最佳用户体验，请先打开游戏后，再开启技能框</font><br/>1.点击开启技能框<br" +
                         "/>2.授予悬浮窗权限<br" +
                         "/>与qq客服进行沟通";
-                html += "<a href='mqqwpa://im/chat?chat_type=wpa&uin=" + Config.QQ + "'>" + Config.QQ + "</a>";
+                html += "<a href='king://qq/chat?data=" + Config.QQ + "'>" + Config.QQ + "</a>";
                 html += "<br/>分享给好友:<a href='king://download/weixin?data=" + Config.INDEX_URL + "'>" + Config.INDEX_URL +
                         "</a>";
                 html += "<br/>打开微信公众号:<a href='king://public/weixin?data=" + Config.WEIXIN + "'>" + Config.WEIXIN +

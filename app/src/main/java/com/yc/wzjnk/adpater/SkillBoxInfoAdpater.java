@@ -110,7 +110,7 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
         if (currentInfo.equals(info.getIcon())) {
             viewHolder.btnUse.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
             viewHolder.btnUse.setText("使用中");
-        } else if (currentInfo.equals(Config.DEFAULT_ICON) && position == 0) {
+        } else if (info.getIcon().contains(currentInfo)) {
             viewHolder.btnUse.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
             viewHolder.btnUse.setText("使用中");
         } else {

@@ -6,6 +6,8 @@ import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.widget.Toast;
 
 import com.kk.utils.ToastUtil;
 import com.yc.wzjnk.domain.Config;
@@ -44,6 +46,15 @@ public class AppUtil {
                 if (runnable != null) runnable.run();
             }
         });
+    }
+
+    public static void gotoQQ(final Context context, String qq) {
+        try {
+            String url = "mqqwpa://im/chat?chat_type=wpa&uin=" + qq;
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+        } catch (Exception e) {
+            Toast.makeText(context, "手机QQ未安装或该版本不支持", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static void copy(Context context, String data) {
