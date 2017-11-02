@@ -27,6 +27,7 @@ import com.yc.wzjnk.engin.PaywayListEngin;
 import com.yc.wzjnk.ui.BasePopupWindow;
 import com.yc.wzjnk.ui.MainActivity;
 import com.yc.wzjnk.ui.RewardPopupWindow;
+import com.yc.wzjnk.utils.LogUtil;
 import com.yc.wzjnk.utils.PreferenceUtil;
 import com.yc.wzjnk.utils.UIUtil;
 
@@ -42,12 +43,10 @@ public class PayHelper {
     private ImageView ivWxPay;
 
     private TextView tvMoney;
-    private TextView tvPay;
 
     private int payType = Config.ALIPAY;
 
     private IPayAbs iPayAbs;
-    private PaywayListEngin paywayListEngin;
 
     private GoodInfo goodInfo;
     private GoodInfo vipGoodInfo;
@@ -63,7 +62,7 @@ public class PayHelper {
         final Activity context = basePopupWindow.getmContext();
 
         iPayAbs = new I1PayAbs(context);
-        paywayListEngin = new PaywayListEngin(context);
+        PaywayListEngin paywayListEngin = new PaywayListEngin(context);
 
 
         View contextView = basePopupWindow.getContentView();
@@ -71,7 +70,7 @@ public class PayHelper {
         ivWxPay = (ImageView) contextView.findViewById(R.id.iv_wxpay);
 
         tvMoney = (TextView) contextView.findViewById(R.id.tv_money);
-        tvPay = (TextView) contextView.findViewById(R.id.tv_pay);
+        TextView tvPay = (TextView) contextView.findViewById(R.id.tv_pay);
 
         ivAliPay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,16 +129,21 @@ public class PayHelper {
         TaskUtil.getImpl().runTask(new Runnable() {
             @Override
             public void run() {
+
                 String data = PreferenceUtil.getImpl(basePopupWindow.getmContext()).getString(Config.PAY_WAY_LIST_URL, "");
                 if (!data.isEmpty()) {
-                    final ResultInfo<PaywayListInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<PaywayListInfo>>() {
-                    }.getType());
-                    UIUtil.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            setPayway(resultInfo);
-                        }
-                    });
+                    try {
+                        final ResultInfo<PaywayListInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<PaywayListInfo>>() {
+                        }.getType());
+                        UIUtil.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                setPayway(resultInfo);
+                            }
+                        });
+                    }catch (Exception e){
+                        LogUtil.msg("getPaywayList本地缓存" + e);
+                    }
                 }
             }
         });

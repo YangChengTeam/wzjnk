@@ -84,7 +84,6 @@ public class SettingsCompat {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             if (manageDrawOverlaysForRom(context)) {
-                return;
             }
         }
     }

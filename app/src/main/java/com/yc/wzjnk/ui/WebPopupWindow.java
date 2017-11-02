@@ -38,7 +38,6 @@ import com.yc.wzjnk.R;
 
 public class WebPopupWindow extends BasePopupWindow {
 
-    private WebView webView;
     private LoadingDialog loadingDialog;
 
     public WebPopupWindow(Activity context, final String url) {
@@ -49,7 +48,7 @@ public class WebPopupWindow extends BasePopupWindow {
 
         View contextView = inflater.inflate(com.kk.pay.R.layout.ppw_web, null);
 
-        webView = (WebView) contextView.findViewById(com.kk.pay.R.id.wv_pay);
+        WebView webView = (WebView) contextView.findViewById(com.kk.pay.R.id.wv_pay);
         WebSettings webSettings = webView.getSettings();
         webSettings.setUserAgentString("Mozilla/5.0 (Linux; U; Android 4.4.4; zh-CN; HTC D820u Build/KTU84P) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 UCBrowser/10.1.0.527 U3/0.8.0 Mobile Safari/534.30");
         webSettings.setLoadsImagesAutomatically(false);

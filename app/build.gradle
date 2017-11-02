@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.yc.wzjnk"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 10
-        versionName "2.4.5"
+        versionCode 11
+        versionName "2.4.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         defaultConfig {
@@ -38,6 +38,8 @@ android {
             storePassword "123456"
             keyAlias "wzjnk"
             keyPassword "123456"
+
+
         }
     }
 }
@@ -49,12 +51,12 @@ dependencies {
     })
 
     compile files('libs/umeng-analytics-v6.0.1.jar')
+
     compile 'com.squareup.picasso:picasso:2.5.2'
 
     compile 'com.tencent.bugly:crashreport_upgrade:latest.release'
     compile 'com.tencent.bugly:nativecrashreport:latest.release'
 
     compile 'com.shizhefei:ViewPagerIndicator:1.1.6'
-
     compile project(':pay')
 }

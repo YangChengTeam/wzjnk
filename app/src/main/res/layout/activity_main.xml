@@ -66,9 +66,8 @@
         android:id="@+id/tv_user"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:layout_alignParentRight="true"
-        android:gravity="center_vertical"
         android:layout_marginLeft="16dp"
+        android:gravity="center_vertical"
         android:textColor="#FFFFFF"
         android:textSize="14dp"/>
 
@@ -137,34 +136,12 @@
                 android:layout_weight="1"></View>
         </LinearLayout>
 
-        <LinearLayout
+        <include
+            layout="@layout/list_skillbox"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="30dp"
-            android:layout_marginTop="5dp"
-            android:orientation="vertical">
-
-            <com.shizhefei.view.indicator.ScrollIndicatorView
-                android:id="@+id/fiv_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@mipmap/type_bg"></com.shizhefei.view.indicator.ScrollIndicatorView>
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:background="@mipmap/type_line"
-                ></ImageView>
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                ></android.support.v4.view.ViewPager>
-
-
-        </LinearLayout>
+            android:layout_marginTop="5dp"/>
 
     </LinearLayout>
 

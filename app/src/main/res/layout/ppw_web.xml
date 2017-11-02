@@ -12,7 +12,6 @@
             android:id="@+id/wv_pay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_centerInParent="true"
             android:layout_marginBottom="40dp"
             android:layout_marginLeft="50dp"
             android:layout_marginRight="50dp"

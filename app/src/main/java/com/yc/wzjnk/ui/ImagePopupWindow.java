@@ -23,7 +23,6 @@ import com.yc.wzjnk.utils.NavgationBarUtils;
  */
 
 public class ImagePopupWindow extends BasePopupWindow {
-    private ImageView previewImage;
     ImageHelper imageUtil;
 
     public ImagePopupWindow(Activity context, final String iconName) {
@@ -32,7 +31,7 @@ public class ImagePopupWindow extends BasePopupWindow {
 
         imageUtil = new ImageHelper(mContext);
 
-        previewImage = (ImageView) contextView.findViewById(R.id.iv_preview);
+        ImageView previewImage = (ImageView) contextView.findViewById(R.id.iv_preview);
         previewImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,6 +39,7 @@ public class ImagePopupWindow extends BasePopupWindow {
             }
         });
         imageUtil.showImage(mContext, previewImage, iconName);
+
     }
 
     @Override

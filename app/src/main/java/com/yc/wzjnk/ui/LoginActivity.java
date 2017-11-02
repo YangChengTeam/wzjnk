@@ -2,6 +2,7 @@ package com.yc.wzjnk.ui;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,24 +20,14 @@ import com.yc.wzjnk.R;
  * Created by zhangkai on 2017/10/17.
  */
 
-public class LoginActivity extends Activity {
-
-    private Button btnLgoin;
-
+public class LoginActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            // Activity was brought to front and not created,
-            // Thus finishing this will get us to the last viewed activity
-            finish();
-            return;
-        }
-
         setContentView(R.layout.activity_login);
 
-        btnLgoin = (Button) findViewById(R.id.btn_login);
+        Button btnLgoin = (Button) findViewById(R.id.btn_login);
         btnLgoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -46,6 +37,7 @@ public class LoginActivity extends Activity {
                 finish();
             }
         });
+
     }
 
     @Override

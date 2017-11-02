@@ -1,44 +1,18 @@
 package com.yc.wzjnk.ui;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
-import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.kk.pay.I1PayAbs;
-import com.kk.pay.IPayAbs;
-import com.kk.pay.IPayCallback;
-import com.kk.pay.OrderInfo;
-import com.kk.pay.OrderParamsInfo;
-import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.utils.ToastUtil;
 import com.yc.wzjnk.R;
 import com.yc.wzjnk.domain.Config;
-import com.yc.wzjnk.domain.InitInfo;
-import com.yc.wzjnk.domain.PayWayInfo;
-import com.yc.wzjnk.domain.PaywayListInfo;
-import com.yc.wzjnk.engin.PaywayListEngin;
 import com.yc.wzjnk.helper.PayHelper;
-import com.yc.wzjnk.utils.NavgationBarUtils;
 
 import java.util.Random;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 
 
 /**
@@ -49,7 +23,6 @@ public class RewardPopupWindow extends BasePopupWindow {
 
 
     private TextView tvRewardMoney;
-    private TextView tvRandomPrice;
     private EditText etPrice;
 
     private float rewardPrice = 6.66f;
@@ -69,7 +42,7 @@ public class RewardPopupWindow extends BasePopupWindow {
         View contextView = getContentView();
 
         tvRewardMoney = (TextView) contextView.findViewById(R.id.tv_reward_money);
-        tvRandomPrice = (TextView) contextView.findViewById(R.id.tv_random_price);
+        TextView tvRandomPrice = (TextView) contextView.findViewById(R.id.tv_random_price);
         etPrice = (EditText) contextView.findViewById(R.id.et_money);
 
         tvRandomPrice.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +81,6 @@ public class RewardPopupWindow extends BasePopupWindow {
                         payHelper.setMoney(rewardPrice + "元");
                     } catch (Exception e) {
                         ToastUtil.toast(mContext, "输入的金额不符合要求");
-                        return;
                     }
                 }
             }

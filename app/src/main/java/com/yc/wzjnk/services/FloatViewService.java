@@ -31,10 +31,7 @@ public class FloatViewService extends Service {
     }
 
     public boolean isOpen() {
-        if (skillBoxView != null) {
-            return skillBoxView.isOpen();
-        }
-        return false;
+        return skillBoxView != null && skillBoxView.isOpen();
     }
 
     public void removeAllView() {
@@ -72,6 +69,10 @@ public class FloatViewService extends Service {
         public FloatViewService getService() {
             return FloatViewService.this;
         }
+
+
     }
+
+
 
 }

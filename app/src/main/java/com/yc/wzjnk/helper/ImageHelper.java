@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import com.kk.utils.PathUtil;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
-import com.umeng.analytics.MobclickAgent;
 import com.yc.wzjnk.domain.Config;
 import com.yc.wzjnk.domain.GoodInfo;
 import com.yc.wzjnk.ui.MainActivity;
@@ -159,7 +158,8 @@ public class ImageHelper {
 
                 if (assetsFiles != null && assetsFiles.contains(name)) {
                     goodInfo.setIs_download(true);
-                    picasso.load("file:///android_asset/" + name).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                    picasso.load("file:///android_asset/" + name).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy
+                            .NO_CACHE, MemoryPolicy.NO_STORE)
                             .resize(ScreenUtil.dip2px(context, 115),
                                     ScreenUtil
                                             .dip2px
@@ -171,7 +171,8 @@ public class ImageHelper {
                                 (context, 64)).into(imageView);
                         goodInfo.setIs_download(true);
                     } else {
-                        picasso.load(iconName).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
+                        picasso.load(iconName).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE,
+                                MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
                                 (context, 64)).into(imageView);
                     }
                 }

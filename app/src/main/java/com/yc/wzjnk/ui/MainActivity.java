@@ -1,31 +1,20 @@
 package com.yc.wzjnk.ui;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,10 +30,6 @@ import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
 import com.kk.utils.TaskUtil;
 import com.kk.utils.ToastUtil;
-import com.shizhefei.view.indicator.Indicator;
-import com.shizhefei.view.indicator.ScrollIndicatorView;
-import com.shizhefei.view.indicator.slidebar.ColorBar;
-import com.shizhefei.view.indicator.transition.OnTransitionTextListener;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.analytics.game.UMGameAgent;
 import com.yc.wzjnk.App;
@@ -54,45 +39,37 @@ import com.yc.wzjnk.domain.ContactInfo;
 import com.yc.wzjnk.domain.GoodInfo;
 import com.yc.wzjnk.domain.LoginDataInfo;
 import com.yc.wzjnk.domain.StatusInfo;
-import com.yc.wzjnk.domain.TypeInfo;
-import com.yc.wzjnk.domain.TypeListInfo;
 import com.yc.wzjnk.domain.VipInfo;
 import com.yc.wzjnk.engin.LoginEngin;
-import com.yc.wzjnk.engin.TypeEngin;
+import com.yc.wzjnk.helper.SkillBoxListHelper;
 import com.yc.wzjnk.services.FloatViewService;
 import com.yc.wzjnk.services.SkillBoxInfoService;
 import com.yc.wzjnk.utils.AppUtil;
+import com.yc.wzjnk.utils.LogUtil;
 import com.yc.wzjnk.utils.PreferenceUtil;
 import com.yc.wzjnk.utils.SettingsCompat;
 import com.yc.wzjnk.utils.UIUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
 
-    private Button btnOpen;
-    private Button btnReward;
-    private Button btnUsage;
 
-    private ImageView ivShare;
-    private ImageView ivQQ;
-    private ImageView ivWeiXin;
+    private TextView tvUser;
+
+    private Button btnOpen;
     private ImageView ivRefresh;
 
     private LoadingDialog loadingDialog;
     private LoginEngin loginEngin;
 
     private GoodInfo vipGoodInfo;
-
-    private TextView tvTitle;
-    private TextView tvUser;
 
     public static final String CURRENT_INFO = "currentInfo";
     public static final String OPEN_SERVICE = "openService";
@@ -101,72 +78,43 @@ public class MainActivity extends FragmentActivity {
 
     private List<VipInfo> vipInfoList;
     private ContactInfo contactInfo;
-    private StatusInfo statusInfo;
 
-    private TypeEngin typeEngin;
-    private ScrollIndicatorView scrollIndicatorView;
-    private ViewPager mViewPager;
-    private List<SkillBoxFragment> skillBoxFragments;
-
-    public GoodInfo getVipGoodInfo() {
-        return vipGoodInfo;
-    }
-
-    public void setVipGoodInfo(GoodInfo vipGoodInfo) {
-        this.vipGoodInfo = vipGoodInfo;
-    }
-
-    private static final long MIN_CLICK_INTERVAL = 600;
-    private int mSecretNumber = 0;
-    private long mLastClickTime;
-
+    SkillBoxListHelper skillBoxListHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if ((getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            // Activity was brought to front and not created,
-            // Thus finishing this will get us to the last viewed activity
-            finish();
-            return;
-        }
-
         setContentView(R.layout.activity_main);
 
         loginEngin = new LoginEngin(this);
         loadingDialog = new LoadingDialog(this);
-        typeEngin = new TypeEngin(this);
+        skillBoxListHelper = new SkillBoxListHelper(this);
 
-        tvTitle = (TextView) findViewById(R.id.tv_title);
+        TextView tvTitle = (TextView) findViewById(R.id.tv_title);
         tvUser = (TextView) findViewById(R.id.tv_user);
 
         btnOpen = (Button) findViewById(R.id.btn_open);
-        btnReward = (Button) findViewById(R.id.btn_reward);
-        btnUsage = (Button) findViewById(R.id.btn_usage);
+        Button btnReward = (Button) findViewById(R.id.btn_reward);
+        Button btnUsage = (Button) findViewById(R.id.btn_usage);
 
-        ivShare = (ImageView) findViewById(R.id.iv_share);
-        ivQQ = (ImageView) findViewById(R.id.iv_qq);
-        ivWeiXin = (ImageView) findViewById(R.id.iv_weixin);
+        ImageView ivShare = (ImageView) findViewById(R.id.iv_share);
+        ImageView ivQQ = (ImageView) findViewById(R.id.iv_qq);
+        ImageView ivWeiXin = (ImageView) findViewById(R.id.iv_weixin);
+
         ivRefresh = (ImageView) findViewById(R.id.iv_refresh);
 
         if (GoagalInfo.get().packageInfo != null) {
             tvTitle.setText(getString(R.string.app_name) + "v" + GoagalInfo.get().packageInfo.versionName);
-            tvTitle.setOnClickListener(new View.OnClickListener() {
+            tvTitle.setLongClickable(true);
+            tvTitle.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
-                    long currentClickTime = SystemClock.uptimeMillis();
-                    long elapsedTime = currentClickTime - mLastClickTime;
-                    mLastClickTime = currentClickTime;
-                    if (++mSecretNumber == 5 && elapsedTime < MIN_CLICK_INTERVAL) {
-                        openAccessibility();
-                        mSecretNumber = 0;
-                    }
+                public boolean onLongClick(View v) {
+                    openAccessibility();
+                    return true;
                 }
             });
         }
 
-
-        getLoginInfo();
 
         //分享
         ivShare.setOnClickListener(new View.OnClickListener() {
@@ -195,7 +143,7 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 App.playMp3();
-                if (checkQQInstalled(MainActivity.this)) {
+                if (AppUtil.checkQQInstalled(MainActivity.this)) {
                     if (contactInfo != null && contactInfo.getQq() != null) {
                         Config.QQ = contactInfo.getQq();
                     }
@@ -258,7 +206,7 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 loadingDialog.show("正在同步数据");
-                refreshData();
+                skillBoxListHelper.refreshData();
                 getLoginInfo();
             }
         });
@@ -268,7 +216,7 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 App.playMp3();
-                open();
+                openSkillBoxPermission();
             }
         });
 
@@ -280,48 +228,24 @@ public class MainActivity extends FragmentActivity {
         }
 
         mainActivity = this;
+        getLoginInfo();
+        skillBoxListHelper.getTypeInfo();
 
-        scrollIndicatorView = (ScrollIndicatorView) findViewById(R.id.fiv_indicator);
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        scrollIndicatorView.setScrollBar(new ColorBar(this, Color.TRANSPARENT, 1));
-        float unSelectSize = 15;
-        float selectSize = 15;
-        int selectColor = Color.WHITE;
-        int unSelectColor = Color.parseColor("#8c9caf");
-        scrollIndicatorView.setOnTransitionListener(new OnTransitionTextListener().setColor(selectColor, unSelectColor).setSize(selectSize, unSelectSize));
-        scrollIndicatorView.setOnIndicatorItemClickListener(new Indicator.OnIndicatorItemClickListener() {
-            @Override
-            public boolean onItemClick(View clickItemView, int position) {
-                mViewPager.setCurrentItem(position);
-                return false;
-            }
-        });
-        scrollIndicatorView.setCurrentItem(0, true);
-
-        getTypeInfo();
-        checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, "请允许授予储存卡写入权限，下载更多炫酷技能框");
+        AppUtil.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, "请允许授予储存卡写入权限，下载更多炫酷技能框");
     }
 
-    public boolean checkPermission(String permission, String msg) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-                }
-                requestMultiplePermissions(permission);
-                return false;
-            }
-            return true;
-        }
-        return true;
+    public static MainActivity mainActivity;
+
+    public static MainActivity getMainActivity() {
+        return mainActivity;
     }
 
-    private static final int REQUEST_CODE = 1;
+    public GoodInfo getVipGoodInfo() {
+        return vipGoodInfo;
+    }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void requestMultiplePermissions(String permission) {
-        String[] permissions = {permission};
-        requestPermissions(permissions, REQUEST_CODE);
+    public void setVipGoodInfo(GoodInfo vipGoodInfo) {
+        this.vipGoodInfo = vipGoodInfo;
     }
 
     public void fixOpenwx() {
@@ -347,59 +271,6 @@ public class MainActivity extends FragmentActivity {
                 .build().show();
     }
 
-    public static MainActivity mainActivity;
-
-    public static MainActivity getMainActivity() {
-        return mainActivity;
-    }
-
-
-    public void getTypeInfo(final ResultInfo<TypeListInfo> resultInfo) {
-        if (resultInfo != null && resultInfo.code == HttpConfig.STATUS_OK && resultInfo
-                .data != null && resultInfo.data.getList() != null) {
-            if (skillBoxFragments != null && skillBoxFragments.size() == resultInfo.data.getList().size() + 1) {
-                notifyDataSetChanged();
-            } else {
-                initFragments(resultInfo.data.getList());
-            }
-        }
-    }
-
-    public void getTypeInfo() {
-        TaskUtil.getImpl().runTask(new Runnable() {
-            @Override
-            public void run() {
-                String data = PreferenceUtil.getImpl(MainActivity.this).getString(Config.TYPE_LIST_URL, "");
-                if (!data.isEmpty()) {
-                    final ResultInfo<TypeListInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<TypeListInfo>>() {
-                    }.getType());
-                    UIUtil.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            getTypeInfo(resultInfo);
-                        }
-                    });
-                }
-            }
-        });
-        typeEngin.getTypeList().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ResultInfo<TypeListInfo>>() {
-            @Override
-            public void call(final ResultInfo<TypeListInfo> resultInfo) {
-                if (resultInfo != null && resultInfo.code == HttpConfig.STATUS_OK && resultInfo
-                        .data != null && resultInfo.data.getList() != null) {
-                    TaskUtil.getImpl().runTask(new Runnable() {
-                        @Override
-                        public void run() {
-                            PreferenceUtil.getImpl(MainActivity.this).putString(Config.TYPE_LIST_URL, JSON.toJSONString
-                                    (resultInfo));
-                        }
-                    });
-                    getTypeInfo(resultInfo);
-                }
-            }
-        });
-    }
-
     public void getLoginInfo() {
         ivRefresh.setClickable(false);
         TaskUtil.getImpl().runTask(new Runnable() {
@@ -407,14 +278,18 @@ public class MainActivity extends FragmentActivity {
             public void run() {
                 String data = PreferenceUtil.getImpl(MainActivity.this).getString(Config.INIT_URL, "");
                 if (!data.isEmpty()) {
-                    final ResultInfo<LoginDataInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<LoginDataInfo>>() {
-                    }.getType());
-                    UIUtil.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            getLoginInfo(resultInfo);
-                        }
-                    });
+                    try {
+                        final ResultInfo<LoginDataInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<LoginDataInfo>>() {
+                        }.getType());
+                        UIUtil.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                getLoginInfo(resultInfo);
+                            }
+                        });
+                    } catch (Exception e) {
+                        LogUtil.msg("getLoginInfo本地缓存" + e);
+                    }
                 }
             }
         });
@@ -443,7 +318,7 @@ public class MainActivity extends FragmentActivity {
         if (resultInfo.data != null) {
             vipInfoList = resultInfo.data.getVipInfoList();
             contactInfo = resultInfo.data.getContactInfo();
-            statusInfo = resultInfo.data.getStatusInfo();
+            StatusInfo statusInfo = resultInfo.data.getStatusInfo();
             String txt = "";
             if (vipInfoList != null && vipInfoList.size() > 0) {
                 vipInfoList = resultInfo.data.getVipInfoList();
@@ -460,106 +335,14 @@ public class MainActivity extends FragmentActivity {
                     }
                 });
             }
-            notifyDataSetChanged();
+            skillBoxListHelper.notifyDataSetChanged();
         }
     }
 
     //更新列表
     public void notifyDataSetChanged() {
-        if (skillBoxFragments == null) return;
-        for (SkillBoxFragment skillBoxFragment : skillBoxFragments) {
-            skillBoxFragment.notifyDataSetChanged();
-        }
-    }
-
-    public void refreshData() {
-        if (skillBoxFragments == null) return;
-        for (SkillBoxFragment skillBoxFragment : skillBoxFragments) {
-            skillBoxFragment.loadData();
-        }
-    }
-
-    private void initFragments(List<TypeInfo> typeInfos) {
-        String[] titles = new String[1 + typeInfos.size()];
-        String[] types = new String[1 + typeInfos.size()];
-        titles[0] = "全部";
-        types[0] = "";
-        for (int i = 0; i < typeInfos.size(); i++) {
-            titles[i + 1] = typeInfos.get(i).getName();
-            types[i + 1] = typeInfos.get(i).getId();
-        }
-        scrollIndicatorView.setAdapter(new MyAdapter(this, titles));
-        MyFragmentAdapter mFragmentAdapter = new MyFragmentAdapter(getSupportFragmentManager(),
-                types);
-        mViewPager.setAdapter(mFragmentAdapter);
-        mViewPager.setCurrentItem(0);
-        mViewPager.setOffscreenPageLimit(3);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int i, float v, int i1) {
-
-            }
-
-            @Override
-            public void onPageSelected(int i) {
-                scrollIndicatorView.setCurrentItem(i, true);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
-            }
-        });
-    }
-
-    class MyAdapter extends Indicator.IndicatorAdapter {
-        private Activity mContext;
-        private String[] mTitles;
-
-        public MyAdapter(Activity context, String[] titles) {
-            super();
-            this.mContext = context;
-            this.mTitles = titles;
-        }
-
-        @Override
-        public int getCount() {
-            return mTitles.length;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = mContext.getLayoutInflater().inflate(R.layout.view_tab, parent, false);
-            }
-            TextView textView = (TextView) convertView;
-            textView.setText(mTitles[position]);
-            return convertView;
-        }
-    }
-
-    class MyFragmentAdapter extends FragmentStatePagerAdapter {
-        private int count;
-
-        public MyFragmentAdapter(FragmentManager fm, String[] types) {
-            super(fm);
-            skillBoxFragments = new ArrayList<>();
-            for (int i = 0; i < types.length; i++) {
-                SkillBoxFragment skillBoxFragment = new SkillBoxFragment();
-                skillBoxFragment.setType(types[i]);
-                skillBoxFragments.add(skillBoxFragment);
-            }
-            count = types.length;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return skillBoxFragments.get(position);
-        }
-
-        @Override
-        public int getCount() {
-            return count;
+        if (skillBoxListHelper != null) {
+            skillBoxListHelper.notifyDataSetChanged();
         }
     }
 
@@ -595,10 +378,7 @@ public class MainActivity extends FragmentActivity {
     //是否是vip
     public boolean isVip() {
         String vip = PreferenceUtil.getImpl(MainActivity.this).getString(VIP, "");
-        if (vip.equals("")) {
-            return false;
-        }
-        return true;
+        return !vip.equals("");
     }
 
     private boolean hasSetting = false;
@@ -613,25 +393,24 @@ public class MainActivity extends FragmentActivity {
         return flag;
     }
 
-    /**
-     * 开启权限
-     */
-    private void open() {
+    private void openSkillBoxPermission() {
         try {
             if (!canDrawOverlays()) {
-                createFloatView(); //某些机型主动调一次 开启悬浮窗权限才有效
-                removeAllView();
+                if (!App.isBugBrand()) {
+                    createFloatView(); //某些机型主动调一次 开启悬浮窗权限才有效
+                    removeAllView();
+                }
                 SettingsCompat.manageDrawOverlays(this);
                 hasSetting = true;
             } else {
-                openSkillBox();
+                enableSkillBox();
             }
         } catch (Exception e) {
-            openSkillBox();
+            enableSkillBox();
         }
     }
 
-    private void openSkillBox() {
+    private void enableSkillBox() {
         String isOpen = PreferenceUtil.getImpl(this).getString(OPEN_SERVICE, "");
         if (isOpen.equals("")) {
             PreferenceUtil.getImpl(this).putString(OPEN_SERVICE, OPEN_SERVICE);
@@ -656,12 +435,6 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-    public boolean checkQQInstalled(Context context) {
-        Uri uri = Uri.parse("mqqwpa://im/chat?chat_type=wpa&uin=");
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        ComponentName componentName = intent.resolveActivity(context.getPackageManager());
-        return componentName != null;
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -697,7 +470,7 @@ public class MainActivity extends FragmentActivity {
     private void openAccessibility() {
         if (!SkillBoxInfoService.isRunning()) {
             new MaterialDialog.Builder(this)
-                    .title("提示")
+                    .title("体验版")
                     .content("点击[❤❤王者荣耀技能框❤❤]开启服务, 悬浮球只会出现在王者应用上，并有效解决黑屏问题！")
                     .positiveText("确定")
                     .backgroundColor(Color.WHITE)
@@ -714,6 +487,8 @@ public class MainActivity extends FragmentActivity {
                         }
                     })
                     .build().show();
+        } else {
+            ToastUtil.toast2(this, "王者荣耀技能框辅助功能已开启");
         }
     }
 
@@ -752,10 +527,7 @@ public class MainActivity extends FragmentActivity {
 
 
     public boolean isOpen() {
-        if (mFloatViewService != null) {
-            return mFloatViewService.isOpen();
-        }
-        return false;
+        return mFloatViewService != null && mFloatViewService.isOpen();
     }
 
     public void removeAllView() {

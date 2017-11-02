@@ -36,4 +36,9 @@ public class RecyclerImageView extends ImageView {
             LogUtil.msg("RecyclerImageView  -> onDraw() Canvas: trying to use a recycled bitmap");
         }
     }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
 }

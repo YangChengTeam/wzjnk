@@ -35,7 +35,6 @@ public abstract class BasePopupWindow extends PopupWindow {
     }
 
     private ColorDrawable mBackgroundDrawable;
-    private ImageView ivClose;
 
     public BasePopupWindow(Activity context) {
         super(context);
@@ -55,20 +54,25 @@ public abstract class BasePopupWindow extends PopupWindow {
 
         setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+
+        preSetContentView();
+        setWindowAlpha(0.5f);
         setContentView(contextView);
         setOutsideTouchable(false);
-        ivClose = (ImageView) contextView.findViewById(R.id.iv_close);
+
+        ImageView  ivClose = (ImageView) contextView.findViewById(R.id.iv_close);
         ivClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
             }
         });
-        setWindowAlpha(0.5f);
-
-
 
     }
+
+
+    public void preSetContentView(){}
+
 
     public abstract int getLayoutID();
 

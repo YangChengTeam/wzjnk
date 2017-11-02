@@ -108,13 +108,13 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
 
         String currentInfo = PreferenceUtil.getImpl(mContext).getString(MainActivity.CURRENT_INFO, Config.DEFAULT_ICON);
         if (currentInfo.equals(info.getIcon())) {
-            viewHolder.btnUse.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
+            viewHolder.btnUse.setBackground(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
             viewHolder.btnUse.setText("使用中");
         } else if (info.getIcon().contains(currentInfo)) {
-            viewHolder.btnUse.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
+            viewHolder.btnUse.setBackground(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
             viewHolder.btnUse.setText("使用中");
         } else {
-            viewHolder.btnUse.setBackgroundDrawable(ContextCompat.getDrawable(mContext, R.drawable.btn5_selector));
+            viewHolder.btnUse.setBackground(ContextCompat.getDrawable(mContext, R.drawable.btn5_selector));
             viewHolder.btnUse.setText("使用");
         }
 

@@ -73,6 +73,7 @@ public class SkillBoxView {
     }
 
     private void setParamsType(WindowManager.LayoutParams params) {
+
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
             params.type = WindowManager.LayoutParams.TYPE_PHONE;
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -284,7 +285,6 @@ public class SkillBoxView {
                     }
                     hide();
                 }
-                return;
             }
         }
     };
@@ -362,6 +362,4 @@ public class SkillBoxView {
         imageUtil.recyleBimaps();
         imageUtil.showImage(mContext, imageSkillBoxView);
     }
-
-
 }
