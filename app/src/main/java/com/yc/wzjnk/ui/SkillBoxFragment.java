@@ -2,10 +2,7 @@ package com.yc.wzjnk.ui;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -165,6 +162,7 @@ public class SkillBoxFragment extends LazyFragment {
                 }
             }
         });
+
         goodEngin.getGoodList().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ResultInfo<GoodListInfo>>() {
             @Override
             public void call(final ResultInfo<GoodListInfo> resultInfo) {

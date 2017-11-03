@@ -9,12 +9,12 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.text.Html;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -59,7 +59,6 @@ import rx.functions.Action1;
 public class MainActivity extends BaseActivity {
 
     private static final String TAG = "MainActivity";
-
 
     private TextView tvUser;
 
@@ -181,7 +180,8 @@ public class MainActivity extends BaseActivity {
                 if (vipInfoList != null && vipInfoList.size() > 0) {
                     Config.QQ = Config.VIP_QQ;
                 }
-                String html = "<font color='red'>**注意**<br/>最佳用户体验，请先打开游戏后，再开启技能框</font><br/>1.点击开启技能框<br" +
+                String html = "<font color='red'>**特别提醒**<br/>长按顶部【" + getResources()
+                        .getString(R.string.app_name) + "】，体验隐藏功能</font><br/>1.点击开启技能框<br" +
                         "/>2.授予悬浮窗权限<br" +
                         "/>与qq客服进行沟通";
                 html += "<a href='king://qq/chat?data=" + Config.QQ + "'>" + Config.QQ + "</a>";
@@ -220,18 +220,22 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        try {
-            Intent intent = new Intent(this, FloatViewService.class);
-            startService(intent);
-            bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
-        } catch (Exception e) {
-        }
+        startService();
 
         mainActivity = this;
         getLoginInfo();
         skillBoxListHelper.getTypeInfo();
 
         AppUtil.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, "请允许授予储存卡写入权限，下载更多炫酷技能框");
+    }
+
+    public void startService() {
+        try {
+            Intent intent = new Intent(this, FloatViewService.class);
+            startService(intent);
+            bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
+        } catch (Exception e) {
+        }
     }
 
     public static MainActivity mainActivity;
@@ -250,8 +254,10 @@ public class MainActivity extends BaseActivity {
 
     public void fixOpenwx() {
         AppUtil.copy(MainActivity.this, Config.WEIXIN);
-        String html = "更多精彩内容，尽在王者技能框 <br/>微信公众号：<a href=king://public/weixin?data='" + Config
-                .WEIXIN + "'>" + Config
+        String html = "更多精彩内容，尽在" + getResources().getString(R.string.app_name) + " <br/>微信公众号：<a " +
+                "href=king://public/weixin?data='" +
+                Config
+                        .WEIXIN + "'>" + Config
                 .WEIXIN +
                 "</a>";
         new MaterialDialog.Builder(MainActivity.this)
@@ -396,7 +402,8 @@ public class MainActivity extends BaseActivity {
     private void openSkillBoxPermission() {
         try {
             if (!canDrawOverlays()) {
-                if (!App.isBugBrand()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < Build.VERSION_CODES
+                        .M) {
                     createFloatView(); //某些机型主动调一次 开启悬浮窗权限才有效
                     removeAllView();
                 }
@@ -409,6 +416,23 @@ public class MainActivity extends BaseActivity {
             enableSkillBox();
         }
     }
+
+    private boolean checkSkillBoxPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT <= Build.VERSION_CODES
+                .N) {
+            return true;
+        }
+        try {
+            if (!canDrawOverlays()) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
 
     private void enableSkillBox() {
         String isOpen = PreferenceUtil.getImpl(this).getString(OPEN_SERVICE, "");
@@ -442,7 +466,7 @@ public class MainActivity extends BaseActivity {
             App.playMp3();
             new MaterialDialog.Builder(MainActivity.this)
                     .title("提示")
-                    .content("确认退出王者技能框大师?")
+                    .content("确认退出" + getResources().getString(R.string.app_name) + "?")
                     .positiveText("确定")
                     .negativeText("取消")
                     .backgroundColor(Color.WHITE)
@@ -471,7 +495,7 @@ public class MainActivity extends BaseActivity {
         if (!SkillBoxInfoService.isRunning()) {
             new MaterialDialog.Builder(this)
                     .title("体验版")
-                    .content("点击[❤❤王者荣耀技能框❤❤]开启服务, 悬浮球只会出现在王者应用上，并有效解决黑屏问题！")
+                    .content("点击[❤❤" + getResources().getString(R.string.app_name) + "❤❤]开启辅助功能, 解决黑屏问题！")
                     .positiveText("确定")
                     .backgroundColor(Color.WHITE)
                     .contentColor(Color.GRAY)
@@ -481,14 +505,18 @@ public class MainActivity extends BaseActivity {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             if (which == DialogAction.POSITIVE) {
-                                Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-                                startActivity(intent);
+                                try {
+                                    Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                                    startActivity(intent);
+                                } catch (Exception e) {
+                                    LogUtil.msg("openAccessibility异常" + e);
+                                }
                             }
                         }
                     })
                     .build().show();
         } else {
-            ToastUtil.toast2(this, "王者荣耀技能框辅助功能已开启");
+            ToastUtil.toast2(this, getResources().getString(R.string.app_name) + "辅助功能已开启");
         }
     }
 
@@ -531,31 +559,25 @@ public class MainActivity extends BaseActivity {
     }
 
     public void removeAllView() {
-        if (mFloatViewService != null) {
+        if (checkSkillBoxPermission() && mFloatViewService != null) {
             mFloatViewService.removeAllView();
         }
     }
 
     public void createFloatView() {
-        if (mFloatViewService != null) {
+        if (checkSkillBoxPermission() && mFloatViewService != null) {
             mFloatViewService.createFloatView();
         }
     }
 
     public void removeSkillBoxView() {
-        if (mFloatViewService != null) {
+        if (checkSkillBoxPermission() && mFloatViewService != null) {
             mFloatViewService.removeSkillBoxView();
         }
     }
 
-    public void addSkillBoxView() {
-        if (mFloatViewService != null) {
-            mFloatViewService.addSkillBoxView();
-        }
-    }
-
     public void updateSkillBoxView() {
-        if (mFloatViewService != null) {
+        if (checkSkillBoxPermission() && mFloatViewService != null) {
             mFloatViewService.updateSkillBoxView();
         }
     }

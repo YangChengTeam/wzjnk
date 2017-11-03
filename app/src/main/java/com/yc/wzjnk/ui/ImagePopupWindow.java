@@ -1,21 +1,11 @@
 package com.yc.wzjnk.ui;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 
 import com.yc.wzjnk.R;
 import com.yc.wzjnk.helper.ImageHelper;
-import com.yc.wzjnk.utils.NavgationBarUtils;
 
 
 /**

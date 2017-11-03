@@ -6,8 +6,6 @@ import com.alibaba.fastjson.TypeReference;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.engin.BaseEngin;
 import com.yc.wzjnk.domain.Config;
-import com.yc.wzjnk.domain.GoodListInfo;
-import com.yc.wzjnk.domain.TypeInfo;
 import com.yc.wzjnk.domain.TypeListInfo;
 
 import rx.Observable;

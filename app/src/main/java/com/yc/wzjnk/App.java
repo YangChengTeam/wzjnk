@@ -28,7 +28,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         TaskUtil.getImpl().runTask(new Runnable() {
             @Override
             public void run() {
@@ -75,9 +74,9 @@ public class App extends Application {
                 HttpConfig.setDefaultParams(params);
 
                 //动态设置渠道信息
-                String appId_agentId = "王者技能框-渠道id" + agent_id;
+                String appId_agentId = getResources().getString(R.string.app_name) + "-渠道id" + agent_id;
                 MobclickAgent.startWithConfigure(new MobclickAgent.UMAnalyticsConfig(getApplicationContext(),
-                        "59e8116107fe650a04000070", appId_agentId));
+                        getResources().getString(R.string.umeng_id), appId_agentId));
             }
         });
     }
@@ -86,18 +85,6 @@ public class App extends Application {
         return android.os.Build.MODEL.contains(android.os.Build.BRAND) ? android.os.Build.MODEL + " " + android
                 .os.Build.VERSION.RELEASE : Build.BRAND + " " + android
                 .os.Build.MODEL + " " + android.os.Build.VERSION.RELEASE;
-    }
-
-    public static boolean isBugBrand() {
-        boolean flag = false;
-        String sv = getSV();
-        String[] brands = new String[]{"oneplus", "gionee", "nx563j", "yu", "zte", "m8wl", "moto", "hisense", "redmi"};
-        for (String brand : brands) {
-            if (sv.toLowerCase().contains(brand)) {
-                flag = true;
-            }
-        }
-        return flag;
     }
 
     public static void playMp3() {

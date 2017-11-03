@@ -4,6 +4,7 @@ package com.yc.wzjnk.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -41,6 +42,7 @@ public abstract class BasePopupWindow extends PopupWindow {
         this.mContext = context;
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        assert inflater != null;
         View contextView = inflater.inflate(getLayoutID(), null);
 
         try {
@@ -48,7 +50,11 @@ public abstract class BasePopupWindow extends PopupWindow {
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                    );
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                contextView.setSystemUiVisibility(contextView.getSystemUiVisibility()| View
+                        .SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            }
         } catch (Exception e) {
         }
 

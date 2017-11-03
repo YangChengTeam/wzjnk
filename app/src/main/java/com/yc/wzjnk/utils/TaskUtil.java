@@ -6,10 +6,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by zhangkai on 16/9/20.
- */
-
-/**
  * TaskUtil is a task runer util.
  */
 public class TaskUtil {

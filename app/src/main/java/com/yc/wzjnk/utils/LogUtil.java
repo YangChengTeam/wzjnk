@@ -45,6 +45,7 @@ public class LogUtil {
 		}
 	}
 
+    @SuppressWarnings("ConstantConditions")
     public static void msg(String msg) {
         Logger.init(TAG);
         switch (LEVEL) {

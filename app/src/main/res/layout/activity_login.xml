@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="50dp"
-        android:src="@drawable/ioc_loading"></ImageView>
+        android:src="@drawable/ioc_loading"
+        android:contentDescription="TODO"></ImageView>
 
 
     <Button

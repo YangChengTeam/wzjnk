@@ -39,21 +39,15 @@ public class SettingsCompat {
     public static boolean canDrawOverlays(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return Settings.canDrawOverlays(context);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return checkOp(context, OP_SYSTEM_ALERT_WINDOW);
-        } else {
-            return true;
-        }
+        } else
+            return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || checkOp(context, OP_SYSTEM_ALERT_WINDOW);
     }
 
     public static boolean canWriteSettings(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return Settings.System.canWrite(context);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            return checkOp(context, OP_WRITE_SETTINGS);
-        } else {
-            return true;
-        }
+        } else
+            return Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 || checkOp(context, OP_WRITE_SETTINGS);
     }
 
     public static boolean setDrawOverlays(Context context, boolean allowed) {
@@ -64,6 +58,7 @@ public class SettingsCompat {
         return setMode(context, OP_WRITE_SETTINGS, allowed);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public static void manageDrawOverlays(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
@@ -115,18 +110,23 @@ public class SettingsCompat {
         if (RomUtil.isQiku()) {
             return manageDrawOverlaysForQihu(context);
         }
-        if (RomUtil.isSmartisan()) {
-            return manageDrawOverlaysForSmartisan(context);
-        }
-        return false;
+        return RomUtil.isSmartisan() && manageDrawOverlaysForSmartisan(context);
     }
 
 
     private static boolean checkOp(Context context, int op) {
-        AppOpsManager manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        AppOpsManager manager = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        }
         try {
-            Method method = AppOpsManager.class.getDeclaredMethod("checkOp", int.class, int.class, String.class);
-            return AppOpsManager.MODE_ALLOWED == (int) method.invoke(manager, op, Binder.getCallingUid(), context.getPackageName());
+            Method method = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                method = AppOpsManager.class.getDeclaredMethod("checkOp", int.class, int.class, String.class);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                return AppOpsManager.MODE_ALLOWED == (int) method.invoke(manager, op, Binder.getCallingUid(), context.getPackageName());
+            }
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
         }
@@ -139,11 +139,19 @@ public class SettingsCompat {
             return false;
         }
 
-        AppOpsManager manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        AppOpsManager manager = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        }
         try {
-            Method method = AppOpsManager.class.getDeclaredMethod("setMode", int.class, int.class, String.class, int.class);
-            method.invoke(manager, op, Binder.getCallingUid(), context.getPackageName(), allowed ? AppOpsManager.MODE_ALLOWED : AppOpsManager
-                    .MODE_IGNORED);
+            Method method = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                method = AppOpsManager.class.getDeclaredMethod("setMode", int.class, int.class, String.class, int.class);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                method.invoke(manager, op, Binder.getCallingUid(), context.getPackageName(), allowed ? AppOpsManager.MODE_ALLOWED : AppOpsManager
+                        .MODE_IGNORED);
+            }
             return true;
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
@@ -204,10 +212,7 @@ public class SettingsCompat {
             return true;
         }
         intent.setClassName(HUAWEI_PACKAGE, "com.huawei.permissionmanager.ui.MainActivity");
-        if (startSafely(context, intent)) {
-            return true;
-        }
-        return false;
+        return startSafely(context, intent);
     }
 
     // VIVO

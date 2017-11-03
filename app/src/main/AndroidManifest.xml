@@ -17,7 +17,9 @@
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.Manifest.permission.UPDATE_APP_OPS_STATS"></uses-permission>
     <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW"/>
-    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW"></uses-permission>
+    <uses-permission
+        android:name="android.permission.INTERNAL_SYSTEM_WINDOW"
+        tools:ignore="ProtectedPermissions"></uses-permission>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <!--<uses-permission  android:name="android.permission.PACKAGE_USAGE_STATS" />-->
 
@@ -61,7 +63,7 @@
             android:name=".services.SkillBoxInfoService"
             android:enabled="true"
             android:exported="true"
-            android:label="❤❤王者技能框大师❤❤"
+            android:label="@string/accessibility_service_description"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             >
             <intent-filter>
@@ -92,7 +94,7 @@
 
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="59e8116107fe650a04000070"></meta-data>
+            android:value="@string/umeng_id"></meta-data>
         <meta-data
             android:name="UMENG_CHANNEL"
             android:value="@string/app_name"/>

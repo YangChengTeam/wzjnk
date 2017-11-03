@@ -1,34 +1,19 @@
 package com.yc.wzjnk.ui;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
-import android.widget.PopupWindow;
 
-import com.afollestad.materialdialogs.DialogAction;
-import com.afollestad.materialdialogs.MaterialDialog;
 import com.kk.loading.LoadingDialog;
-import com.kk.pay.IPayImpl;
-import com.kk.pay.NavgationBarUtils;
-import com.kk.utils.ToastUtil;
 import com.yc.wzjnk.R;
 
 
@@ -40,12 +25,15 @@ public class WebPopupWindow extends BasePopupWindow {
 
     private LoadingDialog loadingDialog;
 
+    @SuppressWarnings("StatementWithEmptyBody")
+    @SuppressLint("SetJavaScriptEnabled")
     public WebPopupWindow(Activity context, final String url) {
         super(context);
         loadingDialog = new LoadingDialog(context);
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        assert inflater != null;
         View contextView = inflater.inflate(com.kk.pay.R.layout.ppw_web, null);
 
         WebView webView = (WebView) contextView.findViewById(com.kk.pay.R.id.wv_pay);
@@ -68,7 +56,7 @@ public class WebPopupWindow extends BasePopupWindow {
         if ((!Build.MANUFACTURER.toLowerCase().contains("xiaomi")) && (Build.MANUFACTURER.toLowerCase().contains("huawei"))) {
 
         }
-        if ((Build.VERSION.SDK_INT >= 11) && (Build.MANUFACTURER.toLowerCase().contains("lenovo")))
+        if (Build.MANUFACTURER.toLowerCase().contains("lenovo"))
             webView.setLayerType(1, null);
 
         loadingDialog.show("正在打开微信公众号...");
@@ -80,6 +68,7 @@ public class WebPopupWindow extends BasePopupWindow {
                 openWxpay(url);
             }
 
+            @SuppressWarnings("StatementWithEmptyBody")
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // 如下方案可在非微信内部WebView的H5页面中调出微信支付

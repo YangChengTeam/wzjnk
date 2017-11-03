@@ -24,13 +24,17 @@ public class ProActivity extends Activity {
             if (uri != null) {
                 // king://xxxx/xx?data=xxxx
                 String host = uri.getHost();
-                if (host.equals("public")) {
-                    WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.getMainActivity(), Config.WEIXIN_JUMP_URL);
-                    webPopupWindow.show(MainActivity.getMainActivity().getWindow().getDecorView().getRootView());
-                } else if (host.equals("download")) {
-                    AppUtil.openWxShareText(MainActivity.getMainActivity(), uri.getQueryParameter("data"));
-                } else if (host.equals("qq")) {
-                    AppUtil.gotoQQ(MainActivity.getMainActivity(), Config.QQ);
+                switch (host) {
+                    case "public":
+                        WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.getMainActivity(), Config.WEIXIN_JUMP_URL);
+                        webPopupWindow.show(MainActivity.getMainActivity().getWindow().getDecorView().getRootView());
+                        break;
+                    case "download":
+                        AppUtil.openWxShareText(MainActivity.getMainActivity(), uri.getQueryParameter("data"));
+                        break;
+                    case "qq":
+                        AppUtil.gotoQQ(MainActivity.getMainActivity(), Config.QQ);
+                        break;
                 }
                 finish();
             }

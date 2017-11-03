@@ -5,14 +5,13 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.Toast;
 
+import com.yc.wzjnk.R;
 import com.yc.wzjnk.domain.Config;
 import com.yc.wzjnk.ui.MainActivity;
-import com.yc.wzjnk.ui.SkillBoxView;
 import com.yc.wzjnk.utils.PreferenceUtil;
 
 import java.util.Iterator;
@@ -73,6 +72,7 @@ public class SkillBoxInfoService extends AccessibilityService {
         }
 
         AccessibilityManager accessibilityManager = (AccessibilityManager) service.getSystemService(Context.ACCESSIBILITY_SERVICE);
+        assert accessibilityManager != null;
         List<AccessibilityServiceInfo> list = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_GENERIC);
         Iterator<AccessibilityServiceInfo> iterator = list.iterator();
 
@@ -89,7 +89,7 @@ public class SkillBoxInfoService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        Toast.makeText(this, "中断王者技能框大师服务", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "中断" + getResources().getString(R.string.app_name) + "辅助功能服务", Toast.LENGTH_SHORT).show();
         isConnect = false;
     }
 
@@ -101,6 +101,6 @@ public class SkillBoxInfoService extends AccessibilityService {
         service = this;
         isConnect = true;
         PreferenceUtil.getImpl(this).putString(MainActivity.OPEN_SERVICE, MainActivity.OPEN_SERVICE);
-        Toast.makeText(this, "王者技能框大师服务连接上了", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getResources().getString(R.string.app_name) + "辅助功能服务连接上了", Toast.LENGTH_SHORT).show();
     }
 }

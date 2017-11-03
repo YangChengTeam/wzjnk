@@ -2,8 +2,6 @@ package com.yc.wzjnk.helper;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -27,8 +25,8 @@ import com.yc.wzjnk.domain.Config;
 import com.yc.wzjnk.domain.TypeInfo;
 import com.yc.wzjnk.domain.TypeListInfo;
 import com.yc.wzjnk.engin.TypeEngin;
-import com.yc.wzjnk.ui.MainActivity;
 import com.yc.wzjnk.ui.SkillBoxFragment;
+import com.yc.wzjnk.utils.LogUtil;
 import com.yc.wzjnk.utils.PreferenceUtil;
 import com.yc.wzjnk.utils.UIUtil;
 
@@ -91,14 +89,18 @@ public class SkillBoxListHelper {
             public void run() {
                 String data = PreferenceUtil.getImpl(mConetxt).getString(Config.TYPE_LIST_URL, "");
                 if (!data.isEmpty()) {
-                    final ResultInfo<TypeListInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<TypeListInfo>>() {
-                    }.getType());
-                    UIUtil.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            getTypeInfo(resultInfo);
-                        }
-                    });
+                    try {
+                        final ResultInfo<TypeListInfo> resultInfo = JSON.parseObject(data, new TypeReference<ResultInfo<TypeListInfo>>() {
+                        }.getType());
+                        UIUtil.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                getTypeInfo(resultInfo);
+                            }
+                        });
+                    } catch (Exception e) {
+                        LogUtil.msg("getTypeInfo本地缓存" + e);
+                    }
                 }
             }
         });

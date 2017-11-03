@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
  * Created by zhangkai on 2017/8/10.
  */
 
+@SuppressWarnings("unchecked")
 public class NavgationBarUtils {
     public static boolean checkDeviceHasNavigationBar(Context context) {
         //Android 5.0以下没有虚拟按键

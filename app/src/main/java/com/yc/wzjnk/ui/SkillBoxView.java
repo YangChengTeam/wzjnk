@@ -3,6 +3,7 @@ package com.yc.wzjnk.ui;
 import android.animation.Animator;
 import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.widget.RelativeLayout;
 
 import com.yc.wzjnk.R;
 import com.yc.wzjnk.helper.ImageHelper;
+import com.yc.wzjnk.utils.LogUtil;
 import com.yc.wzjnk.utils.ScreenUtil;
 import com.yc.wzjnk.utils.UIUtil;
 
@@ -27,10 +29,10 @@ import com.yc.wzjnk.utils.UIUtil;
 
 public class SkillBoxView {
     protected final String TAG = "SkillBoxView";
+
     private static SkillBoxView instance = null;
 
     private WindowManager.LayoutParams originParams;
-    private WindowManager.LayoutParams moveParams;
     private WindowManager mWindowManager;
 
     private Context mContext;
@@ -56,6 +58,8 @@ public class SkillBoxView {
     private int mSecondes = 0;
     private boolean animating = false;
 
+    private boolean l = false, r = false, u = true, b = false;
+
     private SkillBoxView(Context context) {
         this.mContext = context;
         screenHeight = ScreenUtil.getHeight(context);
@@ -72,6 +76,13 @@ public class SkillBoxView {
         return instance;
     }
 
+    private void resetMark() {
+        l = false;
+        r = false;
+        u = false;
+        b = false;
+    }
+
     private void setParamsType(WindowManager.LayoutParams params) {
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
@@ -83,6 +94,7 @@ public class SkillBoxView {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void createFloatView() {
         if (mFloatView != null) return;
 
@@ -90,35 +102,24 @@ public class SkillBoxView {
             if (originParams == null) {
                 originParams = new WindowManager.LayoutParams();
                 originParams.format = PixelFormat.RGBA_8888;
-                originParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams
-                        .FLAG_LAYOUT_IN_SCREEN;
+                originParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
                 originParams.gravity = Gravity.LEFT | Gravity.TOP;
 
                 originParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
                 originParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                originParams.x = 0;
-                originParams.y = screenHeight / 2 - 180;
+                originParams.x = screenWidth / 2 - mFloatViewWidth / 2;
+                originParams.y = 0;
 
                 setParamsType(originParams);
             }
 
-            if (moveParams == null) {
-                moveParams = new WindowManager.LayoutParams();
-                moveParams.format = PixelFormat.RGBA_8888;
-                moveParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-                moveParams.gravity = Gravity.LEFT | Gravity.TOP;
-                moveParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-                moveParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-                setParamsType(moveParams);
-            }
             mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         }
 
         mFloatLayout = (RelativeLayout) mInflater
                 .inflate(R.layout.view_float, null);
         mWindowManager.addView(mFloatLayout, originParams);
-        mFloatView = (ImageView) mFloatLayout.findViewById(R.id.iv_float);
+        mFloatView = mFloatLayout.findViewById(R.id.iv_float);
         showOff();
         mFloatView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -139,14 +140,48 @@ public class SkillBoxView {
                         if (!isClick) {
                             int tempy = y;
                             int tempx = x;
-                            if (originParams.x + mFloatViewWidth / 2 <= screenWidth / 2) {
-                                tempx = 0;
-                                tempy = getMinY(y);
 
-                            } else if (originParams.x + mFloatViewWidth / 2 > screenWidth / 2) {
-                                tempx = screenWidth - mFloatViewWidth / 2;
-                                tempy = getMinY(y);
+                            float scaleX, scaleY;
+                            resetMark();
+                            if (tempy + mFloatViewWidth / 2 <= screenHeight / 2) {
+                                scaleY = tempy / (float) screenHeight;
+                                u = true;
+                            } else {
+                                scaleY = (screenHeight - tempy) / (float) screenHeight;
+                                b = true;
                             }
+
+                            if (tempx + mFloatViewWidth / 2 < screenWidth / 2) {
+                                scaleX = tempx / (float) screenWidth;
+                                l = true;
+                            } else {
+                                scaleX = (screenWidth - tempx) / (float) screenWidth;
+                                r = true;
+                            }
+
+                            if (scaleX < scaleY) {
+                                if (l) {
+                                    resetMark();
+                                    l = true;
+                                    tempx = 0;
+                                } else if (r) {
+                                    tempx = screenWidth - mFloatViewWidth / 2;
+                                    resetMark();
+                                    r = true;
+                                }
+
+                            } else {
+                                if (u) {
+                                    tempy = 0;
+                                    resetMark();
+                                    u = true;
+                                } else if (b) {
+                                    tempy = screenHeight - mFloatViewWidth / 2;
+                                    resetMark();
+                                    b = true;
+                                }
+                            }
+
                             animate(x, tempx, y, tempy);
                         }
                         break;
@@ -172,17 +207,6 @@ public class SkillBoxView {
         });
         mFloatView.setOnClickListener(onclick);
         hide();
-    }
-
-    private int getMinY(int y) {
-        if (screenHeight - originParams.y < ScreenUtil.dip2px(mContext, 180)) {
-            y = screenHeight - ScreenUtil.dip2px(mContext, 250);
-        }
-
-        if (originParams.y < ScreenUtil.dip2px(mContext, 30)) {
-            y = ScreenUtil.dip2px(mContext, 30);
-        }
-        return y;
     }
 
     public void hide() {
@@ -216,11 +240,16 @@ public class SkillBoxView {
     }
 
     public void showHide() {
-        if (originParams.x == 0) {
+        if (l) {
             mFloatView.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.float_left));
-        } else {
+        } else if (u) {
+            mFloatView.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.float_up));
+        } else if (b) {
+            mFloatView.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.float_down));
+        } else if (r) {
             mFloatView.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.float_right));
         }
+
     }
 
     private void animate(int x1, int x2, int y1, int y2) {
@@ -290,13 +319,14 @@ public class SkillBoxView {
     };
 
     public void removeAllView() {
+        if (mFloatView == null) return;
         try {
             mWindowManager.removeView(mFloatLayout);
             mFloatView = null;
             removeSkillBoxViewWithState();
         } catch (Exception e) {
+            LogUtil.msg("removeAllView异常" + e);
         }
-        instance = null;
     }
 
     public void removeSkillBoxViewWithState() {
@@ -326,6 +356,7 @@ public class SkillBoxView {
         mFloatView.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.float_on));
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void addSkillBoxView() {
         if (imageSkillBoxView != null) return;
         if (mWindowManager == null) return;
@@ -335,8 +366,9 @@ public class SkillBoxView {
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager
-                        .LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
+                        WindowManager
+                                .LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 PixelFormat.TRANSLUCENT);
         setParamsType(params);
         try {
@@ -344,16 +376,14 @@ public class SkillBoxView {
                     | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                     | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            ;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                params.systemUiVisibility = params.systemUiVisibility | View
+                        .SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            }
         } catch (Exception e) {
         }
         imageSkillBoxView = new ImageView(mContext);
-        imageSkillBoxView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return false;
-            }
-        });
         imageUtil.showImage(mContext, imageSkillBoxView);
         mWindowManager.addView(imageSkillBoxView, params);
     }

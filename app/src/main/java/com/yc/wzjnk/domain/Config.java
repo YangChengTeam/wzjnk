@@ -16,7 +16,7 @@ public class Config {
     public static String QQ = "2171541605";
     public static String VIP_QQ = "2683232504";
 
-    public final static String DEFAULT_ICON = "26.png";
+    public final static String DEFAULT_ICON = "http://db.wk990.com/img/wzjnk/icon/26.png";
     public final static String GAME_PACKAGE_NAME = "com.tencent.tmgp.sgame";
 
     public final static int ALIPAY = 0;
@@ -27,9 +27,6 @@ public class Config {
     public final static int REWARD = 1;
 
     public static boolean DEBUG = false;
-
-    private static String baseUrl = "http://u.wk990.com/api/";
-    private static String debugBaseUrl = "http://120.76.202.236:1980/api/";
 
     public static final String APPID = "?app_id=4";
 
@@ -43,6 +40,8 @@ public class Config {
     public static final String VIP_LIST2_URL = getBaseUrl() + "index/vip_list2" + APPID;
 
     public static String getBaseUrl() {
+        String baseUrl = "http://u.wk990.com/api/";
+        String debugBaseUrl = "http://120.76.202.236:1980/api/";
         return (DEBUG ? debugBaseUrl : baseUrl);
     }
 

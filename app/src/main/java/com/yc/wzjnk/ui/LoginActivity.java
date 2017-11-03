@@ -1,8 +1,6 @@
 package com.yc.wzjnk.ui;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -46,7 +44,7 @@ public class LoginActivity extends BaseActivity {
             App.playMp3();
             new MaterialDialog.Builder(LoginActivity.this)
                     .title("提示")
-                    .content("确认退出王者技能框大师?")
+                    .content("确认退出" + getResources().getString(R.string.app_name) + "?")
                     .positiveText("确定")
                     .negativeText("取消")
                     .backgroundColor(Color.WHITE)

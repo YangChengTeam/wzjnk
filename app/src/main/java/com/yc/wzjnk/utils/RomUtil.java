@@ -121,7 +121,7 @@ public class RomUtil {
     }
 
     public static String getProp(String name) {
-        String line = null;
+        String line;
         BufferedReader input = null;
         try {
             Process p = Runtime.getRuntime().exec("getprop " + name);

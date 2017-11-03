@@ -1,5 +1,6 @@
 package com.yc.wzjnk.helper;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,16 +42,10 @@ import java.util.concurrent.Executors;
 
 public class ImageHelper {
     private String dir = "";
-    private List<String> assetsFiles;
 
     public ImageHelper(Context context) {
         dir = PathUtil.createDir(context, "/images");
-        try {
-            assetsFiles = Arrays.asList(context.getResources().getAssets().list(""));
-        } catch (Exception e) {
-        }
     }
-
 
     public String getIconIntName(String url) {
         if (url == null || url.isEmpty()) {
@@ -110,33 +105,40 @@ public class ImageHelper {
                     show(context, imageView, goodInfo);
                     return;
                 }
-                final Bitmap bmp = getBitmap(context, iconName, sampleSize, "");
-                if (bmp != null) {
+
+                if (!action(context, imageView, iconName, sampleSize, goodInfo)) {
                     UIUtil.post(new Runnable() {
                         @Override
                         public void run() {
-                            imageView.setImageBitmap(bmp);
-                        }
-                    });
-                    pics.add(bmp);
-                    if (goodInfo != null) {
-                        goodInfo.setIs_download(true);
-                    }
-                } else {
-                    UIUtil.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (sampleSize == 1) {
-                                Picasso.with(context).load(iconName).into(imageView);
-                            }
+                            Picasso.with(context).load(iconName).into(imageView);
                         }
                     });
                 }
+
                 if (isplay) {
                     playGif(context, imageView);
                 }
             }
         });
+    }
+
+    private boolean action(final Context context, final ImageView imageView, final String iconName, int sampleSize,
+                           final GoodInfo goodInfo) {
+        final Bitmap bmp = getBitmap(context, iconName, sampleSize, "");
+        if (bmp != null) {
+            UIUtil.post(new Runnable() {
+                @Override
+                public void run() {
+                    imageView.setImageBitmap(bmp);
+                }
+            });
+            pics.add(bmp);
+            if (goodInfo != null) {
+                goodInfo.setIs_download(true);
+            }
+            return true;
+        }
+        return false;
     }
 
     private String getShortName(String iconName, String step) {
@@ -155,26 +157,15 @@ public class ImageHelper {
             public void run() {
                 Picasso picasso = Picasso.with(context);
 //                picasso.setIndicatorsEnabled(true);
-
-                if (assetsFiles != null && assetsFiles.contains(name)) {
+                File file = new File(dir + "/" + name);
+                if (file.exists()) {
+                    picasso.load(file).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
+                            (context, 64)).into(imageView);
                     goodInfo.setIs_download(true);
-                    picasso.load("file:///android_asset/" + name).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy
-                            .NO_CACHE, MemoryPolicy.NO_STORE)
-                            .resize(ScreenUtil.dip2px(context, 115),
-                                    ScreenUtil
-                                            .dip2px
-                                                    (context, 64)).into(imageView);
                 } else {
-                    File file = new File(dir + "/" + name);
-                    if (file.exists()) {
-                        picasso.load(file).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
-                                (context, 64)).into(imageView);
-                        goodInfo.setIs_download(true);
-                    } else {
-                        picasso.load(iconName).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE,
-                                MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
-                                (context, 64)).into(imageView);
-                    }
+                    picasso.load(iconName).config(Bitmap.Config.RGB_565).memoryPolicy(MemoryPolicy.NO_CACHE,
+                            MemoryPolicy.NO_STORE).resize(ScreenUtil.dip2px(context, 115), ScreenUtil.dip2px
+                            (context, 64)).into(imageView);
                 }
             }
 
@@ -188,14 +179,9 @@ public class ImageHelper {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = sampleSize;
         options.inJustDecodeBounds = false;
-        try {
-            bmp = BitmapFactory.decodeStream(context.getAssets().open(name), null,
-                    options);
-        } catch (Exception e) {
-            File file = new File(dir + "/" + name);
-            if (file.exists()) {
-                bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
-            }
+        File file = new File(dir + "/" + name);
+        if (file.exists()) {
+            bmp = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
         }
         return bmp;
     }
@@ -366,6 +352,11 @@ public class ImageHelper {
     }
 
     private void download(@NonNull final String imageUrl, final String path) {
+        download(imageUrl, path, null);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private void download(@NonNull final String imageUrl, final String path, final Runnable skillRunnable) {
         new AsyncTask<Void, Integer, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -412,6 +403,10 @@ public class ImageHelper {
                         runnable = null;
                         idx = 1;
                     }
+                }
+
+                if (skillRunnable != null) {
+                    skillRunnable.run();
                 }
                 return null;
             }

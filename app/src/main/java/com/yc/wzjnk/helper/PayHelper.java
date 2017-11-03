@@ -1,7 +1,6 @@
 package com.yc.wzjnk.helper;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,7 +21,6 @@ import com.yc.wzjnk.domain.Config;
 import com.yc.wzjnk.domain.GoodInfo;
 import com.yc.wzjnk.domain.PayWayInfo;
 import com.yc.wzjnk.domain.PaywayListInfo;
-import com.yc.wzjnk.domain.TypeListInfo;
 import com.yc.wzjnk.engin.PaywayListEngin;
 import com.yc.wzjnk.ui.BasePopupWindow;
 import com.yc.wzjnk.ui.MainActivity;
@@ -90,9 +88,9 @@ public class PayHelper {
         tvPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                float price = 0.f;
-                String name = "";
-                String goodId = "";
+                float price;
+                String name;
+                String goodId;
                 if (basePopupWindow.getVipType() == Config.VIP) {
                     price = Float.parseFloat(vipGoodInfo.getReal_price());
                     name = vipGoodInfo.getAlias();

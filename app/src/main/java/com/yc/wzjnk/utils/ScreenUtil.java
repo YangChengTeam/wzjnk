@@ -31,24 +31,18 @@ public class ScreenUtil {
 
     @SuppressLint("NewApi")
     public static int getHeight(Context paramContext) {
-        if (Build.VERSION.SDK_INT >= 13) {
-            Display localDisplay = ((WindowManager) paramContext.getSystemService(Application.WINDOW_SERVICE)).getDefaultDisplay();
-            Point localPoint = new Point();
-            localDisplay.getSize(localPoint);
-            return localPoint.y;
-        }
-        return paramContext.getResources().getDisplayMetrics().heightPixels;
+        Display localDisplay = ((WindowManager) paramContext.getSystemService(Application.WINDOW_SERVICE)).getDefaultDisplay();
+        Point localPoint = new Point();
+        localDisplay.getSize(localPoint);
+        return localPoint.y;
     }
 
     @SuppressLint("NewApi")
     public static int getWidth(Context paramContext) {
-        if (Build.VERSION.SDK_INT >= 13) {
-            Display localDisplay = ((WindowManager) paramContext.getSystemService(Application.WINDOW_SERVICE)).getDefaultDisplay();
-            Point localPoint = new Point();
-            localDisplay.getSize(localPoint);
-            return localPoint.x;
-        }
-        return paramContext.getResources().getDisplayMetrics().widthPixels;
+        Display localDisplay = ((WindowManager) paramContext.getSystemService(Application.WINDOW_SERVICE)).getDefaultDisplay();
+        Point localPoint = new Point();
+        localDisplay.getSize(localPoint);
+        return localPoint.x;
     }
 
     public static int getHeight(Context context, CharSequence text, int textSize, int deviceWidth, Typeface typeface, int padding) {
