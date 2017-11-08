@@ -72,7 +72,7 @@ public class SettingsCompat {
 
                     }
                 }
-            }finally {
+            } finally {
                 return;
             }
         }

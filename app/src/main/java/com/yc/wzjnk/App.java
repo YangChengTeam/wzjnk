@@ -1,6 +1,7 @@
 package com.yc.wzjnk;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.media.MediaPlayer;
@@ -28,6 +29,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        //全局信息初始化
+        initGoagal(getApplicationContext());
         TaskUtil.getImpl().runTask(new Runnable() {
             @Override
             public void run() {
@@ -43,42 +46,45 @@ public class App extends Application {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                //友盟统计
-                UMGameAgent.setDebugMode(Config.DEBUG);
-                UMGameAgent.init(App.this);
-                UMGameAgent.setPlayerLevel(1);
-                MobclickAgent.setScenarioType(App.this, MobclickAgent.EScenarioType.E_UM_NORMAL);
-                //全局信息初始化
-                GoagalInfo.get().init(getApplicationContext());
-
-                //设置文件唯一性 防止手机相互拷贝
-                FileUtil.setUuid(GoagalInfo.get().uuid);
-
-                //设置http默认参数
-                String agent_id = "1";
-                Map<String, String> params = new HashMap<>();
-                if (GoagalInfo.get().channelInfo != null && GoagalInfo.get().channelInfo.agent_id != null) {
-                    params.put("from_id", GoagalInfo.get().channelInfo.from_id + "");
-                    params.put("author", GoagalInfo.get().channelInfo.author + "");
-                    agent_id = GoagalInfo.get().channelInfo.agent_id;
-                }
-                params.put("agent_id", agent_id);
-                params.put("ts", System.currentTimeMillis() + "");
-                params.put("imeil", GoagalInfo.get().uuid);
-                String sv = getSV();
-                params.put("sv", sv);
-                params.put("device_type", "2");
-                if (GoagalInfo.get().packageInfo != null) {
-                    params.put("app_version", GoagalInfo.get().packageInfo.versionName + "");
-                }
-                HttpConfig.setDefaultParams(params);
-
-                //动态设置渠道信息
-                String appId_agentId = getResources().getString(R.string.app_name) + "-渠道id" + agent_id;
-                MobclickAgent.startWithConfigure(new MobclickAgent.UMAnalyticsConfig(getApplicationContext(),
-                        getResources().getString(R.string.umeng_id), appId_agentId));
             }
         });
+    }
+
+
+    public static void initGoagal(Context context) {
+        GoagalInfo.get().init(context);
+
+        //设置文件唯一性 防止手机相互拷贝
+        FileUtil.setUuid(GoagalInfo.get().uuid);
+
+        //设置http默认参数
+        String agent_id = "1";
+        Map<String, String> params = new HashMap<>();
+        if (GoagalInfo.get().channelInfo != null && GoagalInfo.get().channelInfo.agent_id != null) {
+            params.put("from_id", GoagalInfo.get().channelInfo.from_id + "");
+            params.put("author", GoagalInfo.get().channelInfo.author + "");
+            agent_id = GoagalInfo.get().channelInfo.agent_id;
+        }
+        params.put("agent_id", agent_id);
+        params.put("ts", System.currentTimeMillis() + "");
+        params.put("imeil", GoagalInfo.get().uuid);
+        String sv = getSV();
+        params.put("sv", sv);
+        params.put("device_type", "2");
+        if (GoagalInfo.get().packageInfo != null) {
+            params.put("app_version", GoagalInfo.get().packageInfo.versionName + "");
+        }
+        HttpConfig.setDefaultParams(params);
+
+        //动态设置渠道信息
+        String appId_agentId = context.getResources().getString(R.string.app_name) + "-渠道id" + agent_id;
+        MobclickAgent.startWithConfigure(new MobclickAgent.UMAnalyticsConfig(context,
+                context.getResources().getString(R.string.umeng_id), appId_agentId));
+        //友盟统计
+        UMGameAgent.setDebugMode(Config.DEBUG);
+        UMGameAgent.init(context);
+        UMGameAgent.setPlayerLevel(1);
+        MobclickAgent.setScenarioType(context, MobclickAgent.EScenarioType.E_UM_NORMAL);
     }
 
     public static String getSV() {

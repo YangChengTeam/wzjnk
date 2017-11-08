@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity {
 
     private Button btnOpen;
     private ImageView ivRefresh;
+    private TextView tvTitle;
 
     private LoadingDialog loadingDialog;
     private LoginEngin loginEngin;
@@ -89,30 +90,19 @@ public class MainActivity extends BaseActivity {
         loadingDialog = new LoadingDialog(this);
         skillBoxListHelper = new SkillBoxListHelper(this);
 
-        TextView tvTitle = (TextView) findViewById(R.id.tv_title);
+        tvTitle = (TextView) findViewById(R.id.tv_title);
         tvUser = (TextView) findViewById(R.id.tv_user);
 
         btnOpen = (Button) findViewById(R.id.btn_open);
         Button btnReward = (Button) findViewById(R.id.btn_reward);
         Button btnUsage = (Button) findViewById(R.id.btn_usage);
+        Button btnWeixin = findViewById(R.id.btn_weixin);
 
         ImageView ivShare = (ImageView) findViewById(R.id.iv_share);
         ImageView ivQQ = (ImageView) findViewById(R.id.iv_qq);
         ImageView ivWeiXin = (ImageView) findViewById(R.id.iv_weixin);
 
         ivRefresh = (ImageView) findViewById(R.id.iv_refresh);
-
-        if (GoagalInfo.get().packageInfo != null) {
-            tvTitle.setText(getString(R.string.app_name) + "v" + GoagalInfo.get().packageInfo.versionName);
-            tvTitle.setLongClickable(true);
-            tvTitle.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    openAccessibility();
-                    return true;
-                }
-            });
-        }
 
 
         //分享
@@ -130,6 +120,16 @@ public class MainActivity extends BaseActivity {
         ivWeiXin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                App.playMp3();
+                WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.this, Config.WEIXIN_JUMP_URL);
+                webPopupWindow.show(getWindow().getDecorView().getRootView());
+                MobclickAgent.onEvent(MainActivity.this, "king", "打开微信");
+            }
+        });
+
+        btnWeixin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 App.playMp3();
                 WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.this, Config.WEIXIN_JUMP_URL);
                 webPopupWindow.show(getWindow().getDecorView().getRootView());
@@ -183,7 +183,7 @@ public class MainActivity extends BaseActivity {
                 String html = "<font color='red'>**特别提醒**<br/>长按顶部【" + getResources()
                         .getString(R.string.app_name) + "】，体验隐藏功能</font><br/>1.点击开启技能框<br" +
                         "/>2.授予悬浮窗权限<br" +
-                        "/>与qq客服进行沟通";
+                        "/>3.若悬浮球出现一会儿消失情况，请开启通知<br/>与qq客服进行沟通";
                 html += "<a href='king://qq/chat?data=" + Config.QQ + "'>" + Config.QQ + "</a>";
                 html += "<br/>分享给好友:<a href='king://download/weixin?data=" + Config.INDEX_URL + "'>" + Config.INDEX_URL +
                         "</a>";
@@ -205,9 +205,7 @@ public class MainActivity extends BaseActivity {
         ivRefresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loadingDialog.show("正在同步数据");
-                skillBoxListHelper.refreshData();
-                getLoginInfo();
+                refresh();
             }
         });
 
@@ -221,6 +219,8 @@ public class MainActivity extends BaseActivity {
         });
 
         startService();
+
+        setTitle();
 
         mainActivity = this;
         getLoginInfo();
@@ -236,6 +236,30 @@ public class MainActivity extends BaseActivity {
             bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE);
         } catch (Exception e) {
         }
+    }
+
+    private void setTitle() {
+        if (GoagalInfo.get().packageInfo != null) {
+            tvTitle.setText(getString(R.string.app_name) + "v" + GoagalInfo.get().packageInfo.versionName);
+            tvTitle.setLongClickable(true);
+            tvTitle.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    openAccessibility();
+                    return true;
+                }
+            });
+        }
+    }
+
+    private void refresh() {
+        if (!tvTitle.getText().toString().contains("v")) {
+            App.initGoagal(getApplicationContext());
+            setTitle();
+        }
+        loadingDialog.show("正在同步数据");
+        skillBoxListHelper.refreshData();
+        getLoginInfo();
     }
 
     public static MainActivity mainActivity;
@@ -325,19 +349,30 @@ public class MainActivity extends BaseActivity {
             vipInfoList = resultInfo.data.getVipInfoList();
             contactInfo = resultInfo.data.getContactInfo();
             StatusInfo statusInfo = resultInfo.data.getStatusInfo();
-            String txt = "";
-            if (vipInfoList != null && vipInfoList.size() > 0) {
-                vipInfoList = resultInfo.data.getVipInfoList();
-                txt += "尊敬的会员您好，";
-            }
-            if (statusInfo != null) {
-                txt += "用户id: " + statusInfo.getUid();
-                tvUser.setText(txt);
+
+            if (tvTitle.getText().toString().contains("v")) {
+                String txt = "";
+                if (vipInfoList != null && vipInfoList.size() > 0) {
+                    vipInfoList = resultInfo.data.getVipInfoList();
+                    txt += "尊敬的会员您好，";
+                }
+                if (statusInfo != null) {
+                    txt += "用户id: " + statusInfo.getUid();
+                    tvUser.setText(txt);
+                    tvUser.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            AppUtil.copy(MainActivity.this, GoagalInfo.get().uuid);
+                            ToastUtil.toast2(MainActivity.this, "用户id复制成功");
+                        }
+                    });
+                }
+            } else {
+                tvUser.setText("获取用户信息失败， 点击重新拉取用户信息");
                 tvUser.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        AppUtil.copy(MainActivity.this, GoagalInfo.get().uuid);
-                        ToastUtil.toast2(MainActivity.this, "用户id复制成功");
+                        refresh();
                     }
                 });
             }
@@ -356,7 +391,7 @@ public class MainActivity extends BaseActivity {
     public boolean isFree(int id) {
         if (vipInfoList == null) return false;
         for (VipInfo vipInfo : vipInfoList) {
-            if (vipInfo.getType() == 51) {
+            if (vipInfo.getType() == Config.VIP_ID) {
                 return true;
             }
             if (vipInfo.getType() == id) {
@@ -464,9 +499,10 @@ public class MainActivity extends BaseActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             App.playMp3();
+            String html = "<font color=red>退出软件</font>将无法在游戏中使用技能框，<font color=red>请慎重确定！</font>";
             new MaterialDialog.Builder(MainActivity.this)
                     .title("提示")
-                    .content("确认退出" + getResources().getString(R.string.app_name) + "?")
+                    .content(Html.fromHtml(html))
                     .positiveText("确定")
                     .negativeText("取消")
                     .backgroundColor(Color.WHITE)
@@ -482,7 +518,6 @@ public class MainActivity extends BaseActivity {
                         }
                     })
                     .build().show();
-
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -561,6 +596,12 @@ public class MainActivity extends BaseActivity {
     public void removeAllView() {
         if (checkSkillBoxPermission() && mFloatViewService != null) {
             mFloatViewService.removeAllView();
+        }
+    }
+
+    public void addSkillBoxView() {
+        if (checkSkillBoxPermission() && mFloatViewService != null) {
+            mFloatViewService.addSkillBoxView();
         }
     }
 

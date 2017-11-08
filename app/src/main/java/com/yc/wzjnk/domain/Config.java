@@ -7,6 +7,8 @@ import android.os.Environment;
  */
 
 public class Config {
+    public static boolean DEBUG = false;
+
     public final static String INDEX_URL = "http://u.wk990.com/dk/share.html?jnk";
 
     public static final String PATH = Environment.getExternalStorageDirectory() + "/";
@@ -15,6 +17,8 @@ public class Config {
     public final static String WEIXIN = "jinengkuang";
     public static String QQ = "2171541605";
     public static String VIP_QQ = "2683232504";
+    public final static int VIP_ID = 51;
+
 
     public final static String DEFAULT_ICON = "http://db.wk990.com/img/wzjnk/icon/26.png";
     public final static String GAME_PACKAGE_NAME = "com.tencent.tmgp.sgame";
@@ -25,9 +29,7 @@ public class Config {
     public final static int VIP = 0;
     public final static int GOODS = 2;
     public final static int REWARD = 1;
-
-    public static boolean DEBUG = false;
-
+    
     public static final String APPID = "?app_id=4";
 
     public static final String INIT_URL = getBaseUrl() + "index/init" + APPID;

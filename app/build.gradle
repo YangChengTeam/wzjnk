@@ -7,8 +7,8 @@ android {
         applicationId "com.yc.wzjnk"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 15
-        versionName "2.5.1"
+        versionCode 22
+        versionName "3.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         defaultConfig {
@@ -38,8 +38,6 @@ android {
             storePassword "123456"
             keyAlias "wzjnk"
             keyPassword "123456"
-
-
         }
     }
 }
@@ -58,5 +56,6 @@ dependencies {
     compile 'com.tencent.bugly:nativecrashreport:3.3.1'
 
     compile 'com.shizhefei:ViewPagerIndicator:1.1.6'
+
     compile project(':pay')
 }

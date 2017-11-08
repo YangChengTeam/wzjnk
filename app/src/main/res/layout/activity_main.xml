@@ -86,8 +86,8 @@
 
             <Button
                 android:id="@+id/btn_open"
-                android:layout_width="155dp"
-                android:layout_height="56dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn2_selector"
@@ -103,8 +103,8 @@
 
             <Button
                 android:id="@+id/btn_reward"
-                android:layout_width="155dp"
-                android:layout_height="56dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_selector"
@@ -120,8 +120,8 @@
 
             <Button
                 android:id="@+id/btn_usage"
-                android:layout_width="155dp"
-                android:layout_height="56dp"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn3_selector"
@@ -134,6 +134,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"></View>
+
+            <Button
+                android:id="@+id/btn_weixin"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn2_selector"
+                android:gravity="center"
+                android:text="关注微信公众号"
+                android:textColor="#FFFFFF"
+                android:textSize="14dp"/>
         </LinearLayout>
 
         <include

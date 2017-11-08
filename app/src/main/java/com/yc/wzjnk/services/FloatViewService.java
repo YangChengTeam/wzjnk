@@ -40,31 +40,52 @@ public class FloatViewService extends Service {
                 checkCircle();
             }
         });
-
     }
 
+    private static Runnable runnable;
+    private boolean isProtail = false;
+
     public void checkCircle() {
-        Runnable runnable = new Runnable() {
+        runnable = new Runnable() {
             @Override
             public void run() {
-                if (isDestroy()) return;
-
-                MainActivity mainActivity = MainActivity.getMainActivity();
-
-                if (mainActivity == null) return;
+                if (isDestroy()) {
+                    if (skillBoxView != null) {
+                        skillBoxView.showOff();
+                    }
+                    return;
+                }
 
                 String isOpen = PreferenceUtil.getImpl(getApplicationContext()).getString(MainActivity.OPEN_SERVICE, "");
                 if (!SkillBoxInfoService.isRunning() && !isOpen.equals("")) {
                     if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        mainActivity.createFloatView();
+                        if (isOpen()) {
+                            addSkillBoxView();
+                        }
+                        if (isProtail) {
+                            if (skillBoxView != null) {
+                                skillBoxView.hide();
+                            }
+                        }
+                        isProtail = false;
                     } else {
-                        mainActivity.removeAllView();
+                        if (!isProtail && isOpen()) {
+                            if (skillBoxView != null) {
+                                skillBoxView.showOn();
+                            }
+                        } else {
+                            if (skillBoxView != null) {
+                                skillBoxView.showOff();
+                            }
+                        }
+                        isProtail = true;
+                        removeSkillBoxView();
                     }
                 }
-                UIUtil.postDelayed(1000, this);
+                UIUtil.postDelayed(2000, this);
             }
         };
-        UIUtil.postDelayed(1000, runnable);
+        UIUtil.postDelayed(2000, runnable);
     }
 
     public boolean isOpen() {
@@ -83,9 +104,21 @@ public class FloatViewService extends Service {
         }
     }
 
-    public void removeSkillBoxView() {
+    public void removeSkillBoxViewWithState() {
         if (skillBoxView != null) {
             skillBoxView.removeSkillBoxViewWithState();
+        }
+    }
+
+    public void removeSkillBoxView() {
+        if (skillBoxView != null) {
+            skillBoxView.removeSkillBoxView();
+        }
+    }
+
+    public void addSkillBoxView() {
+        if (skillBoxView != null) {
+            skillBoxView.addSkillBoxView();
         }
     }
 
@@ -110,6 +143,7 @@ public class FloatViewService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        stopForeground(true);
         destroy = true;
         MainActivity mainActivity = MainActivity.getMainActivity();
         if (mainActivity != null) {

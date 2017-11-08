@@ -129,7 +129,9 @@ public class ImageHelper {
             UIUtil.post(new Runnable() {
                 @Override
                 public void run() {
-                    imageView.setImageBitmap(bmp);
+                    if (imageView != null) {
+                        imageView.setImageBitmap(bmp);
+                    }
                 }
             });
             pics.add(bmp);

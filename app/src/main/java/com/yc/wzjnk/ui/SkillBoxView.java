@@ -5,6 +5,7 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
@@ -55,16 +56,19 @@ public class SkillBoxView {
     private int screenHeight;
     private int screenWidth;
 
+    //动画
     private int mSecondes = 0;
     private boolean animating = false;
 
-    private boolean l = false, r = false, u = true, b = false;
+    private boolean l = false, r = false, u = true, b = false;  //四个方向上的标记
+    private int offset; //检测是否是点击还是移动
 
     private SkillBoxView(Context context) {
         this.mContext = context;
         screenHeight = ScreenUtil.getHeight(context);
         screenWidth = ScreenUtil.getWidth(context);
         mFloatViewWidth = ScreenUtil.dip2px(context, 50);
+        offset = ScreenUtil.dip2px(context, 5);
         imageUtil = new ImageHelper(mContext);
         mInflater = LayoutInflater.from(context);
     }
@@ -193,8 +197,8 @@ public class SkillBoxView {
                         }
                         mSecondes = 0;
                         animating = true;
-                        if (!isClick || (Math.abs(originParams.x - x) > ScreenUtil.dip2px(mContext, 30)
-                                || Math.abs(originParams.y - y) > ScreenUtil.dip2px(mContext, 30))) {
+                        if (!isClick || (Math.abs(originParams.x - x) > offset)
+                                || Math.abs(originParams.y - y) > offset) {
                             isClick = false;
                             originParams.x = x;
                             originParams.y = y;
@@ -210,12 +214,22 @@ public class SkillBoxView {
     }
 
     public void hide() {
+        if (mContext != null && mContext.getResources().getConfiguration().orientation == Configuration
+                .ORIENTATION_PORTRAIT) {
+            mSecondes = 0;
+            return;
+        }
         mSecondes = 0;
         animating = false;
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 // TODO Auto-generated method stub
+                if (mContext != null && mContext.getResources().getConfiguration().orientation == Configuration
+                        .ORIENTATION_PORTRAIT) {
+                    mSecondes = 0;
+                    return;
+                }
                 if (mFloatView == null) {
                     mSecondes = 0;
                     return;
@@ -318,6 +332,7 @@ public class SkillBoxView {
         }
     };
 
+
     public void removeAllView() {
         if (mFloatView == null) return;
         try {
@@ -327,6 +342,7 @@ public class SkillBoxView {
         } catch (Exception e) {
             LogUtil.msg("removeAllView异常" + e);
         }
+
     }
 
     public void removeSkillBoxViewWithState() {

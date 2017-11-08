@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.Html;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -42,9 +43,10 @@ public class LoginActivity extends BaseActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             App.playMp3();
+            String html ="<font color=red>退出软件</font>将无法在游戏中使用技能框，<font color=red>请慎重确定！</font>";
             new MaterialDialog.Builder(LoginActivity.this)
                     .title("提示")
-                    .content("确认退出" + getResources().getString(R.string.app_name) + "?")
+                    .content(Html.fromHtml(html))
                     .positiveText("确定")
                     .negativeText("取消")
                     .backgroundColor(Color.WHITE)

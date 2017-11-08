@@ -57,7 +57,8 @@
             android:name=".ui.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:screenOrientation="sensorLandscape"></activity>
+            android:screenOrientation="sensorLandscape"
+            android:launchMode="singleTop"></activity>
 
         <service
             android:name=".services.SkillBoxInfoService"
