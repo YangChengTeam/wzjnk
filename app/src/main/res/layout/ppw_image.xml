@@ -20,7 +20,7 @@
             android:scaleType="fitXY"
             android:src="@mipmap/dt"/>
 
-        <com.yc.wzjnk.ui.RecyclerImageView
+        <com.yc.wzmhk.ui.RecyclerImageView
             android:id="@+id/iv_preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

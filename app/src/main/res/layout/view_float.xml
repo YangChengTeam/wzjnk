@@ -4,7 +4,7 @@
                 android:layout_height="wrap_content"
     >
 
-    <com.yc.wzjnk.ui.RecyclerImageView
+    <com.yc.wzmhk.ui.RecyclerImageView
         android:id="@+id/iv_float"
         android:layout_width="50dp"
         android:layout_height="50dp"

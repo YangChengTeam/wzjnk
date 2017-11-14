@@ -10,7 +10,7 @@
         android:layout_height="64dp"
         android:layout_gravity="center_horizontal">
 
-        <com.yc.wzjnk.ui.RecyclerImageView
+        <com.yc.wzmhk.ui.RecyclerImageView
             android:id="@+id/icon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
