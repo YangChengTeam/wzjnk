@@ -86,13 +86,12 @@
 
             <Button
                 android:id="@+id/btn_open"
-                android:layout_width="150dp"
-                android:layout_height="50dp"
+                android:layout_width="137dp"
+                android:layout_height="41dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn2_selector"
                 android:gravity="center"
-                android:text="开启技能框"
                 android:textColor="#FFFFFF"
                 android:textSize="14dp"/>
 
@@ -103,13 +102,12 @@
 
             <Button
                 android:id="@+id/btn_reward"
-                android:layout_width="150dp"
-                android:layout_height="50dp"
+                android:layout_width="137dp"
+                android:layout_height="41dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/btn_selector"
+                android:background="@drawable/btn21_selector"
                 android:gravity="center"
-                android:text="打赏"
                 android:textColor="#FFFFFF"
                 android:textSize="14dp"/>
 
@@ -120,13 +118,12 @@
 
             <Button
                 android:id="@+id/btn_usage"
-                android:layout_width="150dp"
-                android:layout_height="50dp"
+                android:layout_width="137dp"
+                android:layout_height="41dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn3_selector"
                 android:gravity="center"
-                android:text="使用方法"
                 android:textColor="#FFFFFF"
                 android:textSize="14dp"/>
 
@@ -137,13 +134,12 @@
 
             <Button
                 android:id="@+id/btn_weixin"
-                android:layout_width="150dp"
-                android:layout_height="50dp"
+                android:layout_width="137dp"
+                android:layout_height="41dp"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/btn2_selector"
+                android:background="@drawable/btn22_selector"
                 android:gravity="center"
-                android:text="关注微信公众号"
                 android:textColor="#FFFFFF"
                 android:textSize="14dp"/>
         </LinearLayout>
@@ -152,7 +148,6 @@
             layout="@layout/list_skillbox"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="30dp"
             android:layout_marginTop="5dp"/>
 
     </LinearLayout>

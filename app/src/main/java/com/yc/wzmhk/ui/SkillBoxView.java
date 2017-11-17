@@ -68,7 +68,7 @@ public class SkillBoxView {
         screenHeight = ScreenUtil.getHeight(context);
         screenWidth = ScreenUtil.getWidth(context);
         mFloatViewWidth = ScreenUtil.dip2px(context, 50);
-        offset = ScreenUtil.dip2px(context, 30);
+        offset = ScreenUtil.dip2px(context, 20);
         imageUtil = new ImageHelper(mContext);
         mInflater = LayoutInflater.from(context);
     }

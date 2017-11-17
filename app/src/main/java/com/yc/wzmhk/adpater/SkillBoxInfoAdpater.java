@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yc.wzmhk.R;
@@ -16,6 +18,7 @@ import com.yc.wzmhk.domain.GoodInfo;
 import com.yc.wzmhk.helper.ImageHelper;
 import com.yc.wzmhk.ui.MainActivity;
 import com.yc.wzmhk.utils.PreferenceUtil;
+import com.yc.wzmhk.utils.ScreenUtil;
 
 import java.util.List;
 
@@ -107,13 +110,10 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
         String currentInfo = PreferenceUtil.getImpl(mContext).getString(MainActivity.CURRENT_INFO, Config.DEFAULT_ICON);
         if (currentInfo.equals(info.getIcon())) {
             viewHolder.btnUse.setBackground(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
-            viewHolder.btnUse.setText("使用中");
         } else if (info.getIcon().contains(currentInfo)) {
             viewHolder.btnUse.setBackground(ContextCompat.getDrawable(mContext, R.drawable.btn6_selector));
-            viewHolder.btnUse.setText("使用中");
         } else {
             viewHolder.btnUse.setBackground(ContextCompat.getDrawable(mContext, R.drawable.btn5_selector));
-            viewHolder.btnUse.setText("使用");
         }
 
         imageUtil.showImage(mContext, viewHolder.ivIcon, info.getIcon(), 10, info);

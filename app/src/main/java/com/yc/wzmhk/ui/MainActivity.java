@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.view.KeyEvent;
 import android.view.View;
@@ -472,11 +473,11 @@ public class MainActivity extends BaseActivity {
         String isOpen = PreferenceUtil.getImpl(this).getString(OPEN_SERVICE, "");
         if (isOpen.equals("")) {
             PreferenceUtil.getImpl(this).putString(OPEN_SERVICE, OPEN_SERVICE);
-            btnOpen.setText("已启用");
+            btnOpen.setBackground(ContextCompat.getDrawable(this, R.drawable.btn23_selector));
             createFloatView();
         } else {
             PreferenceUtil.getImpl(this).putString(OPEN_SERVICE, "");
-            btnOpen.setText("开启技能框");
+            btnOpen.setBackground(ContextCompat.getDrawable(this, R.drawable.btn2_selector));
             removeAllView();
         }
     }
@@ -487,7 +488,7 @@ public class MainActivity extends BaseActivity {
         UMGameAgent.onResume(this);
         if (canDrawOverlays() && hasSetting) {
             PreferenceUtil.getImpl(this).putString(OPEN_SERVICE, OPEN_SERVICE);
-            btnOpen.setText("已启用");
+            btnOpen.setBackground(ContextCompat.getDrawable(this, R.drawable.btn23_selector));
             hasSetting = false;
             createFloatView();
         }
@@ -565,10 +566,10 @@ public class MainActivity extends BaseActivity {
             mFloatViewService = ((FloatViewService.FloatViewServiceBinder) iBinder).getService();
             String isOpen = PreferenceUtil.getImpl(MainActivity.this).getString(OPEN_SERVICE, "");
             if (isOpen.equals("")) {
-                btnOpen.setText("开启技能框");
+                btnOpen.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.btn2_selector));
                 removeAllView();
             } else {
-                btnOpen.setText("已启用");
+                btnOpen.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.btn23_selector));
                 createFloatView();
             }
         }
