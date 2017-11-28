@@ -4,11 +4,11 @@ android {
     compileSdkVersion 27
     buildToolsVersion '26.0.2'
     defaultConfig {
-        applicationId "com.yc.lykds"
+        applicationId "com.yc.kkds"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 26
-        versionName "5.0.0"
+        versionCode 28
+        versionName "5.0.1P"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         defaultConfig {
@@ -27,14 +27,14 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file('lykds.jks')
+            storeFile file('lykds2.jks')
             storePassword "123456"
             keyAlias "lykds"
             keyPassword "123456"
         }
 
         release {
-            storeFile file('lykds.jks')
+            storeFile file('lykds2.jks')
             storePassword "123456"
             keyAlias "lykds"
             keyPassword "123456"
