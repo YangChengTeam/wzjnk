@@ -14,8 +14,8 @@ public class Config {
     public static final String PATH = Environment.getExternalStorageDirectory() + "/";
 
     public final static String WEIXIN_JUMP_URL = "http://c.xq12.com/ad/g?p=11";
-    public final static String WEIXIN = "jinengkuang";
-    public static String QQ = "2171541605";
+    public final static String WEIXIN = "技能框大师";
+    public static String QQ = "2683232504";
     public static String VIP_QQ = "2683232504";
     public final static int VIP_ID = 51;
 
@@ -25,11 +25,12 @@ public class Config {
 
     public final static int ALIPAY = 0;
     public final static int WXPAY = 1;
+    public final static int WXGZ = 2;
 
     public final static int VIP = 0;
     public final static int GOODS = 2;
     public final static int REWARD = 1;
-    
+
     public static final String APPID = "?app_id=4";
 
     public static final String INIT_URL = getBaseUrl() + "index/init" + APPID;
@@ -40,6 +41,8 @@ public class Config {
     public static final String PAY_WAY_LIST_URL = getBaseUrl() + "index/payway_list" + APPID;
     public static final String TYPE_LIST_URL = getBaseUrl() + "index/vip_flag_list" + APPID;
     public static final String VIP_LIST2_URL = getBaseUrl() + "index/vip_list2" + APPID;
+    public static final String GET_USER_INFO_URL = getBaseUrl() + "index/get_user_info" + APPID;
+    public static final String UPADTE_USER_INFO_URL = getBaseUrl() + "index/upd_user_info" + APPID;
 
     public static String getBaseUrl() {
         String baseUrl = "http://u.wk990.com/api/";

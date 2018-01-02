@@ -118,7 +118,6 @@
 
                     <ImageView
                         android:id="@+id/iv_alipay"
-
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@mipmap/alipay_select_hover"/>
@@ -126,13 +125,24 @@
                     <View
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="4"></View>
+                        android:layout_weight="2"></View>
 
                     <ImageView
                         android:id="@+id/iv_wxpay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@mipmap/wxpay_select"/>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"></View>
+
+                    <ImageView
+                        android:id="@+id/iv_wxgz"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/wxpay_gz_select"/>
 
                 </LinearLayout>
 

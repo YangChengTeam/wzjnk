@@ -26,8 +26,7 @@ public class ProActivity extends Activity {
                 String host = uri.getHost();
                 switch (host) {
                     case "public":
-                        WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.getMainActivity(), Config.WEIXIN_JUMP_URL);
-                        webPopupWindow.show(MainActivity.getMainActivity().getWindow().getDecorView().getRootView());
+                        MainActivity.getMainActivity().fixOpenwx();
                         break;
                     case "download":
                         AppUtil.openWxShareText(MainActivity.getMainActivity(), uri.getQueryParameter("data"));

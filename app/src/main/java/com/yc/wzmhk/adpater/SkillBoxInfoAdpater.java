@@ -34,6 +34,11 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
     private LayoutInflater inflater;
     private ImageHelper imageUtil;
     private String type;
+    private boolean isBindPhone;
+
+    public boolean isBindPhone() {
+        return isBindPhone;
+    }
 
     public void setType(String type) {
         this.type = type;
@@ -44,6 +49,8 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
         this.dataInfos = dataInfos;
         inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         imageUtil = new ImageHelper(mContext);
+
+        isBindPhone = PreferenceUtil.getImpl(mContext).getBoolean("bindPhone", false);
     }
 
     @Override
@@ -53,6 +60,10 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
         } else {
             return dataInfos != null ? dataInfos.size() : 0;
         }
+    }
+
+    public void setBindPhone(boolean bindPhone) {
+        isBindPhone = bindPhone;
     }
 
     @Override
@@ -100,7 +111,10 @@ public class SkillBoxInfoAdpater extends BaseAdapter {
         });
 
         MainActivity mainActivity = (MainActivity) mContext;
-        if (info.is_free() || mainActivity.isPay(info.getIcon()) || mainActivity.isVip() || mainActivity.isFree(info
+        if (((info.is_free() && info.getId() == 44 ) ||  (info.is_free() && isBindPhone )) || mainActivity.isPay(info
+                .getIcon()) || mainActivity
+                .isVip() ||
+                mainActivity.isFree(info
                 .getId())) {
             viewHolder.ivFree.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.free));
         } else {

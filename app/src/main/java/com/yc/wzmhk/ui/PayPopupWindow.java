@@ -27,7 +27,6 @@ public class PayPopupWindow extends BasePopupWindow {
     private ImageView ivGoodsSelect;
     private ImageView ivVipSelect;
 
-
     private PayHelper payHelper;
 
     public PayPopupWindow(Activity context) {
@@ -76,6 +75,7 @@ public class PayPopupWindow extends BasePopupWindow {
 
 
     public void setInfo(GoodInfo goodInfo, GoodInfo vipGoodInfo) {
+        MainActivity.getMainActivity().setCurrentGoodInfo(goodInfo);
         payHelper.setInfo(goodInfo, vipGoodInfo);
         tvGoodsPrice.setText(goodInfo.getReal_price() + "元");
         tvVipPrice.setText(vipGoodInfo.getReal_price() + "元");

@@ -3,6 +3,7 @@ package com.yc.wzmhk.ui;
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
@@ -12,9 +13,13 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.telephony.PhoneNumberUtils;
 import android.text.Html;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,6 +30,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.kk.loading.LoadingDialog;
+import com.kk.pay.IPayImpl;
 import com.kk.securityhttp.domain.GoagalInfo;
 import com.kk.securityhttp.domain.ResultInfo;
 import com.kk.securityhttp.net.contains.HttpConfig;
@@ -37,10 +43,17 @@ import com.yc.wzmhk.R;
 import com.yc.wzmhk.domain.Config;
 import com.yc.wzmhk.domain.ContactInfo;
 import com.yc.wzmhk.domain.GoodInfo;
+import com.yc.wzmhk.domain.InitInfo;
 import com.yc.wzmhk.domain.LoginDataInfo;
 import com.yc.wzmhk.domain.StatusInfo;
+import com.yc.wzmhk.domain.UserInfoWrapper;
 import com.yc.wzmhk.domain.VipInfo;
+import com.yc.wzmhk.domain.ZFBCode;
 import com.yc.wzmhk.engin.LoginEngin;
+import com.yc.wzmhk.engin.UserGetEngin;
+import com.yc.wzmhk.engin.UserUpdateEngin;
+import com.yc.wzmhk.engin.ZFBEngin;
+import com.yc.wzmhk.helper.FollowHelper;
 import com.yc.wzmhk.helper.SkillBoxListHelper;
 import com.yc.wzmhk.services.FloatViewService;
 import com.yc.wzmhk.services.SkillBoxInfoService;
@@ -52,8 +65,10 @@ import com.yc.wzmhk.utils.UIUtil;
 
 import java.util.List;
 
+import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 
 public class MainActivity extends BaseActivity {
@@ -78,8 +93,12 @@ public class MainActivity extends BaseActivity {
 
     private List<VipInfo> vipInfoList;
     private ContactInfo contactInfo;
-
+    private ImageView ivPhone;
     SkillBoxListHelper skillBoxListHelper;
+    private FollowHelper followHelper;
+
+    private int is_close_gzh;
+    private boolean isCopyWeiXin = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +108,7 @@ public class MainActivity extends BaseActivity {
         loginEngin = new LoginEngin(this);
         loadingDialog = new LoadingDialog(this);
         skillBoxListHelper = new SkillBoxListHelper(this);
+        followHelper = new FollowHelper();
 
         tvTitle = (TextView) findViewById(R.id.tv_title);
         tvUser = (TextView) findViewById(R.id.tv_user);
@@ -98,12 +118,24 @@ public class MainActivity extends BaseActivity {
         Button btnUsage = (Button) findViewById(R.id.btn_usage);
         Button btnWeixin = findViewById(R.id.btn_weixin);
 
+        ivPhone = findViewById(R.id.iv_phone);
         ImageView ivShare = (ImageView) findViewById(R.id.iv_share);
         ImageView ivQQ = (ImageView) findViewById(R.id.iv_qq);
         ImageView ivWeiXin = (ImageView) findViewById(R.id.iv_weixin);
 
         ivRefresh = (ImageView) findViewById(R.id.iv_refresh);
 
+
+        if (PreferenceUtil.getImpl(this).getBoolean("bindPhone", false)) {
+            ivPhone.setVisibility(View.GONE);
+        }
+        //绑定手机
+        ivPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bindPhone();
+            }
+        });
 
         //分享
         ivShare.setOnClickListener(new View.OnClickListener() {
@@ -115,32 +147,48 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-
-        //微信
-        ivWeiXin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                App.playMp3();
-                WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.this, Config.WEIXIN_JUMP_URL);
-                webPopupWindow.show(getWindow().getDecorView().getRootView());
-                MobclickAgent.onEvent(MainActivity.this, "king", "打开微信");
-            }
-        });
-
         btnWeixin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 App.playMp3();
-                WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.this, Config.WEIXIN_JUMP_URL);
-                webPopupWindow.show(getWindow().getDecorView().getRootView());
+                fixOpenwx();
                 MobclickAgent.onEvent(MainActivity.this, "king", "打开微信");
             }
         });
+
+        ivWeiXin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                App.playMp3();
+                fixOpenwx();
+                MobclickAgent.onEvent(MainActivity.this, "king", "打开微信");
+            }
+        });
+
 
         //QQ
         ivQQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (vipInfoList == null || vipInfoList.size() == 0) {
+                    String html = "由于咨询用户过多，目前本QQ仅供付费用户咨询，付费会员直接点击QQ图标即可联系我。<br/><br/>普通用户可以关注【技能框大师】微信公众号了解使用问题哦。";
+                    new MaterialDialog.Builder(MainActivity.this)
+                            .title("QQ客服说明")
+                            .content(Html.fromHtml(html))
+                            .positiveText("确定")
+                            .backgroundColor(Color.WHITE)
+                            .contentColor(Color.GRAY)
+                            .canceledOnTouchOutside(false)
+                            .onAny(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    fixOpenwx();
+                                }
+                            })
+                            .titleColor(Color.BLACK)
+                            .build().show();
+                    return;
+                }
                 App.playMp3();
                 if (AppUtil.checkQQInstalled(MainActivity.this)) {
                     if (contactInfo != null && contactInfo.getQq() != null) {
@@ -169,6 +217,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+
         //使用教程
         btnUsage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,11 +232,10 @@ public class MainActivity extends BaseActivity {
                 String html = "<font color='red'>**特别提醒**<br/>长按顶部【" + getResources()
                         .getString(R.string.app_name) + "】，体验隐藏功能</font><br/>1.点击开启技能框<br" +
                         "/>2.授予悬浮窗权限<br" +
-                        "/>3.若悬浮球出现一会儿消失情况，请开启通知<br/>与qq客服进行沟通";
-                html += "<a href='king://qq/chat?data=" + Config.QQ + "'>" + Config.QQ + "</a>";
+                        "/>3.若悬浮球出现一会儿消失情况，请开启通知<br/>";
                 html += "<br/>分享给好友:<a href='king://download/weixin?data=" + Config.INDEX_URL + "'>" + Config.INDEX_URL +
                         "</a>";
-                html += "<br/>打开微信公众号:<a href='king://public/weixin?data=" + Config.WEIXIN + "'>" + Config.WEIXIN +
+                html += "<br/>关注公众号:<a href='king://public/weixin?data=" + Config.WEIXIN + "'>" + Config.WEIXIN +
                         "</a>";
                 new MaterialDialog.Builder(MainActivity.this)
                         .title("使用说明")
@@ -227,6 +275,18 @@ public class MainActivity extends BaseActivity {
         skillBoxListHelper.getTypeInfo();
 
         AppUtil.checkPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, "请允许授予储存卡写入权限，下载更多炫酷技能框");
+
+        bindPhone();
+
+        new ZFBEngin(this).getCode().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ResultInfo<ZFBCode>>() {
+            @Override
+            public void call(ResultInfo<ZFBCode> stringResultInfo) {
+                if (!TextUtils.isEmpty(stringResultInfo.data.getZfb_code())) {
+                    AppUtil.copy(MainActivity.this, stringResultInfo.data.getZfb_code());
+                    isCopyWeiXin = false;
+                }
+            }
+        });
     }
 
     public void startService() {
@@ -252,6 +312,13 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    public void saveVip(String vip) {
+        String goods = PreferenceUtil.getImpl(this).getString(MainActivity.GOODS, "");
+        goods += "," + vip;
+        PreferenceUtil.getImpl(this).putString(MainActivity.GOODS, goods);
+    }
+
+
     private void refresh() {
         if (!tvTitle.getText().toString().contains("v")) {
             App.initGoagal(getApplicationContext());
@@ -276,16 +343,29 @@ public class MainActivity extends BaseActivity {
         this.vipGoodInfo = vipGoodInfo;
     }
 
+    private GoodInfo currentGoodInfo;
+
+    public GoodInfo getCurrentGoodInfo() {
+        return currentGoodInfo;
+    }
+
+    public void setCurrentGoodInfo(GoodInfo vipGoodInfo) {
+        this.currentGoodInfo = vipGoodInfo;
+    }
+
     public void fixOpenwx() {
-        AppUtil.copy(MainActivity.this, Config.WEIXIN);
-        String html = "更多精彩内容，尽在" + getResources().getString(R.string.app_name) + " <br/>微信公众号：<a " +
-                "href=king://public/weixin?data='" +
-                Config
-                        .WEIXIN + "'>" + Config
-                .WEIXIN +
-                "</a>";
+        if (is_close_gzh == 0) {
+            WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.getMainActivity(), Config.WEIXIN_JUMP_URL);
+            webPopupWindow.show(MainActivity.getMainActivity().getWindow().getDecorView().getRootView());
+            return;
+        }
+
+        if (isCopyWeiXin) {
+            AppUtil.copy(MainActivity.this, Config.WEIXIN);
+        }
+        String html = "现在起关注【技能框大师】微信公众号，并转发朋友圈即可免费解锁【动态技能框】！<br/><br/>" + "点击确定复制公众号并跳转微信，手动搜索粘贴公众号账号关注！";
         new MaterialDialog.Builder(MainActivity.this)
-                .title("加入微信公众号")
+                .title("关注微信公众号")
                 .content(Html.fromHtml(html))
                 .positiveText("确定")
                 .backgroundColor(Color.WHITE)
@@ -295,7 +375,7 @@ public class MainActivity extends BaseActivity {
                 .onAny(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        AppUtil.gotoWeiXin(MainActivity.this, "下载地址已复制, 正在前往微信...");
+                        AppUtil.gotoWeiXin(MainActivity.this, "公众号已复制，正在前往微信...");
                     }
                 })
                 .build().show();
@@ -346,6 +426,7 @@ public class MainActivity extends BaseActivity {
 
     private void getLoginInfo(final ResultInfo<LoginDataInfo> resultInfo) {
         if (resultInfo.data != null) {
+            is_close_gzh = resultInfo.data.getIs_close_gzh();
             vipInfoList = resultInfo.data.getVipInfoList();
             contactInfo = resultInfo.data.getContactInfo();
             StatusInfo statusInfo = resultInfo.data.getStatusInfo();
@@ -468,6 +549,83 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void bindPhone() {
+        PreferenceUtil.getImpl(MainActivity.this).putBoolean
+                ("bindPhone", true);
+//        new UserGetEngin(this).getUserInfo().observeOn(AndroidSchedulers.mainThread()).subscribe(new Action1<ResultInfo<UserInfoWrapper>>() {
+//            @Override
+//            public void call(ResultInfo<UserInfoWrapper> userInfoWrapperResultInfo) {
+//                if(userInfoWrapperResultInfo.data == null || userInfoWrapperResultInfo.data.getUserInfo() == null){
+//                    showDialog();
+//                    return;
+//                }
+//                if(userInfoWrapperResultInfo.data != null && userInfoWrapperResultInfo.data.getUserInfo() != null
+//                        && TextUtils.isEmpty(userInfoWrapperResultInfo.data.getUserInfo().getMobile())) {
+//                    showDialog();
+//                } else {
+//                    PreferenceUtil.getImpl(MainActivity.this).putBoolean
+//                            ("bindPhone",
+//                                    true);
+//                    ivPhone.setVisibility(View.GONE);
+//                }
+//            }
+//        });
+    }
+
+    private void showDialog() {
+        MaterialDialog dialog = new MaterialDialog.Builder(MainActivity.this)
+                .title("绑定手机获取免费技能框")
+                .titleColor(Color.BLACK)
+                .backgroundColor(Color.WHITE)
+                .inputRange(11, 11, Color.GRAY)
+                .inputType(InputType.TYPE_CLASS_NUMBER)
+                .canceledOnTouchOutside(false)
+                .input("请输入手机号", "", new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(MaterialDialog dialog, CharSequence input) {
+                        if (input.length() > 11) {
+                            input = input.subSequence(0, 10);
+                            dialog.getInputEditText().setText(input);
+                        }
+                        // Do something
+                    }
+                }).positiveText("提交").onAny(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (DialogAction.POSITIVE == which) {
+                            String phone = dialog.getInputEditText().getText().toString();
+                            loadingDialog.show("正在绑定手机号");
+                            new UserUpdateEngin(MainActivity.this).updateUserInfo(phone).observeOn
+                                    (AndroidSchedulers.mainThread()).subscribe
+                                    (new
+                                             Action1<ResultInfo<UserInfoWrapper>>() {
+                                                 @Override
+                                                 public void call(ResultInfo<UserInfoWrapper> userInfoWrapperResultInfo) {
+                                                     loadingDialog.dismiss();
+                                                     if (userInfoWrapperResultInfo.code == HttpConfig.STATUS_OK) {
+                                                         ToastUtil.toast2(MainActivity.this, "绑定成功");
+                                                         PreferenceUtil.getImpl(MainActivity.this).putBoolean
+                                                                 ("bindPhone",
+                                                                         true);
+                                                         ivPhone.setVisibility(View.GONE);
+                                                         skillBoxListHelper.notifyDataSetChanged();
+
+                                                     } else {
+                                                         ToastUtil.toast2(MainActivity.this,
+                                                                 userInfoWrapperResultInfo.message);
+                                                     }
+                                                 }
+                                             });
+                        }
+                    }
+                }).build();
+        dialog.getInputEditText().setTextColor(Color.BLACK);
+        dialog.getInputEditText().setHintTextColor(Color.GRAY);
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams
+                .SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.show();
+    }
+
 
     private void enableSkillBox() {
         String isOpen = PreferenceUtil.getImpl(this).getString(OPEN_SERVICE, "");
@@ -492,6 +650,20 @@ public class MainActivity extends BaseActivity {
             hasSetting = false;
             createFloatView();
         }
+
+        if (IPayImpl.uiPayCallback != null && IPayImpl.uOrderInfo != null && IPayImpl.isGen()) {
+            IPayImpl.checkOrder(IPayImpl.uOrderInfo, IPayImpl.uiPayCallback, "http://u.wk990.com/api/index/orders_query?app_id=4");
+        }
+
+
+        //推测关注成功
+        if (followHelper.isFollowIng() && followHelper.stopWatch()) {
+            LogUtil.msg("推测关注成功");
+            if (currentGoodInfo != null) {
+                saveVip(currentGoodInfo.getIcon());
+            }
+        }
+
     }
 
 
@@ -588,6 +760,9 @@ public class MainActivity extends BaseActivity {
         removeSkillBoxView();
     }
 
+    public void start() {
+        followHelper.start();
+    }
 
     public boolean isOpen() {
         return mFloatViewService != null && mFloatViewService.isOpen();

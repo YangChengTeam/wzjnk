@@ -28,6 +28,16 @@ public class LoginDataInfo {
     @JSONField(name = "user_vip_list")
     private List<VipInfo> vipInfoList;
 
+    private int is_close_gzh;
+
+    public int getIs_close_gzh() {
+        return is_close_gzh;
+    }
+
+    public void setIs_close_gzh(int is_close_gzh) {
+        this.is_close_gzh = is_close_gzh;
+    }
+
     public List<VipInfo> getVipInfoList() {
         return vipInfoList;
     }

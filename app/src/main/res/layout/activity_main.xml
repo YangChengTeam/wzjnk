@@ -32,6 +32,7 @@
             android:src="@mipmap/refresh"/>
 
 
+
         <ImageView
             android:id="@+id/iv_share"
             android:layout_width="wrap_content"
@@ -58,6 +59,16 @@
             android:layout_marginRight="16dp"
             android:layout_toLeftOf="@+id/iv_qq"
             android:src="@mipmap/weixin"/>
+
+        <ImageView
+            android:id="@+id/iv_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:layout_toLeftOf="@+id/iv_weixin"
+            android:src="@mipmap/phone"
+            android:visibility="gone"/>
 
 
     </RelativeLayout>

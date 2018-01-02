@@ -180,6 +180,8 @@ public class SkillBoxFragment extends LazyFragment {
         });
     }
 
+
+
     public void getGoodsInfo(final String type) {
         if (good2Engin == null) return;
 
@@ -224,7 +226,13 @@ public class SkillBoxFragment extends LazyFragment {
 
     private void use(GoodInfo info) {
         MainActivity mainActivity = (MainActivity) getActivity();
-        if (info.is_free() || mainActivity.isVip() || mainActivity.isPay(info.getIcon()) || mainActivity.isFree(info.getId())) {
+        if ((info.getId() == 44 || (infoAdpater.isBindPhone() && info.is_free())) || mainActivity.isVip() ||
+                mainActivity
+                .isPay
+                (info
+                .getIcon()) ||
+                mainActivity.isFree(info
+                .getId())) {
             Toast.makeText(mainActivity, "正在使用" + info.getTitle() + "技能框", Toast.LENGTH_LONG).show();
             infoAdpater.notifyDataSetChanged();
             PreferenceUtil.getImpl(mainActivity).putString(mainActivity.CURRENT_INFO, info.getIcon());
@@ -250,6 +258,7 @@ public class SkillBoxFragment extends LazyFragment {
     //更新列表
     public void notifyDataSetChanged() {
         if (infoAdpater != null) {
+            infoAdpater.setBindPhone(PreferenceUtil.getImpl(getContext()).getBoolean("bindPhone", false));
             infoAdpater.notifyDataSetChanged();
         }
     }
