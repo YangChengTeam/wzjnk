@@ -28,6 +28,7 @@ public class PayPopupWindow extends BasePopupWindow {
     private ImageView ivVipSelect;
 
     private PayHelper payHelper;
+    private LinearLayout llVip;
 
     public PayPopupWindow(Activity context) {
         super(context);
@@ -39,7 +40,7 @@ public class PayPopupWindow extends BasePopupWindow {
         tvGoodsPrice = (TextView) contextView.findViewById(R.id.tv_goods_price);
         tvGoodsTitle = (TextView) contextView.findViewById(R.id.tv_goods_title);
 
-        LinearLayout llVip = (LinearLayout) contextView.findViewById(R.id.ll_vip);
+        llVip = (LinearLayout) contextView.findViewById(R.id.ll_vip);
         tvVipPrice = (TextView) contextView.findViewById(R.id.tv_vip_price);
 
         ivGoodsSelect = (ImageView) contextView.findViewById(R.id.iv_good_select);
@@ -66,6 +67,17 @@ public class PayPopupWindow extends BasePopupWindow {
             }
         });
 
+    }
+
+    public void goodSelected() {
+        vipType = Config.GOODS;
+        llVip.setClickable(false);
+        ivGoodsSelect.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.vip_select_hover));
+        ivVipSelect.setImageDrawable(ContextCompat.getDrawable(mContext, R.mipmap.vip_select));
+    }
+
+    public void vipClickableReset() {
+        llVip.setClickable(true);
     }
 
     @Override

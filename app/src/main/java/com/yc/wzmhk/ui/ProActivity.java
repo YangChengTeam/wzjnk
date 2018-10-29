@@ -26,6 +26,7 @@ public class ProActivity extends Activity {
                 String host = uri.getHost();
                 switch (host) {
                     case "public":
+                        MainActivity.getMainActivity().dismiss();
                         MainActivity.getMainActivity().fixOpenwx();
                         break;
                     case "download":

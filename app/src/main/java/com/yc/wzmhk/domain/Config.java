@@ -13,7 +13,7 @@ public class Config {
 
     public static final String PATH = Environment.getExternalStorageDirectory() + "/";
 
-    public final static String WEIXIN_JUMP_URL = "http://c.xq12.com/ad/g?p=11";
+    public static String WEIXIN_JUMP_URL = "http://jump.hupeh.cn/jnkds0105.php";
     public final static String WEIXIN = "技能框大师";
     public static String QQ = "2683232504";
     public static String VIP_QQ = "2683232504";

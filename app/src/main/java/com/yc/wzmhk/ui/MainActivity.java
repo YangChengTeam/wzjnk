@@ -99,6 +99,11 @@ public class MainActivity extends BaseActivity {
 
     private int is_close_gzh;
     private boolean isCopyWeiXin = true;
+    private String gzh="";
+
+    public boolean isCopyWeiXin() {
+        return isCopyWeiXin;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,19 +121,19 @@ public class MainActivity extends BaseActivity {
         btnOpen = (Button) findViewById(R.id.btn_open);
         Button btnReward = (Button) findViewById(R.id.btn_reward);
         Button btnUsage = (Button) findViewById(R.id.btn_usage);
-        Button btnWeixin = findViewById(R.id.btn_weixin);
+        Button btnWeixin = (Button)findViewById(R.id.btn_weixin);
 
-        ivPhone = findViewById(R.id.iv_phone);
+        ivPhone = (ImageView)findViewById(R.id.iv_phone);
         ImageView ivShare = (ImageView) findViewById(R.id.iv_share);
         ImageView ivQQ = (ImageView) findViewById(R.id.iv_qq);
         ImageView ivWeiXin = (ImageView) findViewById(R.id.iv_weixin);
 
         ivRefresh = (ImageView) findViewById(R.id.iv_refresh);
 
-
         if (PreferenceUtil.getImpl(this).getBoolean("bindPhone", false)) {
             ivPhone.setVisibility(View.GONE);
         }
+
         //绑定手机
         ivPhone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -237,7 +242,7 @@ public class MainActivity extends BaseActivity {
                         "</a>";
                 html += "<br/>关注公众号:<a href='king://public/weixin?data=" + Config.WEIXIN + "'>" + Config.WEIXIN +
                         "</a>";
-                new MaterialDialog.Builder(MainActivity.this)
+                useMaterialDialog = new MaterialDialog.Builder(MainActivity.this)
                         .title("使用说明")
                         .content(Html.fromHtml(html))
                         .positiveText("确定")
@@ -245,7 +250,8 @@ public class MainActivity extends BaseActivity {
                         .backgroundColor(Color.WHITE)
                         .contentColor(Color.GRAY)
                         .titleColor(Color.BLACK)
-                        .build().show();
+                        .build();
+                useMaterialDialog.show();
                 MobclickAgent.onEvent(MainActivity.this, "king", "使用方法");
             }
         });
@@ -256,7 +262,6 @@ public class MainActivity extends BaseActivity {
                 refresh();
             }
         });
-
 
         btnOpen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -287,6 +292,16 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
+
+        showDialogForGZ();
+    }
+
+    private MaterialDialog useMaterialDialog;
+
+    public void dismiss(){
+        if(useMaterialDialog != null){
+            useMaterialDialog.dismiss();
+        }
     }
 
     public void startService() {
@@ -354,31 +369,15 @@ public class MainActivity extends BaseActivity {
     }
 
     public void fixOpenwx() {
-        if (is_close_gzh == 0) {
+        if (is_close_gzh == 0 || !TextUtils.isEmpty(gzh)) {
+            Config.WEIXIN_JUMP_URL = gzh;
             WebPopupWindow webPopupWindow = new WebPopupWindow(MainActivity.getMainActivity(), Config.WEIXIN_JUMP_URL);
             webPopupWindow.show(MainActivity.getMainActivity().getWindow().getDecorView().getRootView());
             return;
         }
 
-        if (isCopyWeiXin) {
-            AppUtil.copy(MainActivity.this, Config.WEIXIN);
-        }
-        String html = "现在起关注【技能框大师】微信公众号，并转发朋友圈即可免费解锁【动态技能框】！<br/><br/>" + "点击确定复制公众号并跳转微信，手动搜索粘贴公众号账号关注！";
-        new MaterialDialog.Builder(MainActivity.this)
-                .title("关注微信公众号")
-                .content(Html.fromHtml(html))
-                .positiveText("确定")
-                .backgroundColor(Color.WHITE)
-                .contentColor(Color.GRAY)
-                .canceledOnTouchOutside(false)
-                .titleColor(Color.BLACK)
-                .onAny(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        AppUtil.gotoWeiXin(MainActivity.this, "公众号已复制，正在前往微信...");
-                    }
-                })
-                .build().show();
+        WxGZPopupWindow wxGZPopupWindow = new WxGZPopupWindow(this);
+        wxGZPopupWindow.show(getWindow().getDecorView().getRootView());
     }
 
     public void getLoginInfo() {
@@ -426,6 +425,7 @@ public class MainActivity extends BaseActivity {
 
     private void getLoginInfo(final ResultInfo<LoginDataInfo> resultInfo) {
         if (resultInfo.data != null) {
+            gzh = resultInfo.data.getGzh();
             is_close_gzh = resultInfo.data.getIs_close_gzh();
             vipInfoList = resultInfo.data.getVipInfoList();
             contactInfo = resultInfo.data.getContactInfo();
@@ -572,6 +572,32 @@ public class MainActivity extends BaseActivity {
 //        });
     }
 
+
+    private void showDialogForGZ(){
+        MaterialDialog dialog = new MaterialDialog.Builder(MainActivity.this)
+                .title("使用说明：")
+                .titleColor(Color.BLACK)
+                .contentColor(Color.parseColor("#333333"))
+                .content("关注「王者技能大师」免费解锁技能框，还有完整使用教程和游戏资讯攻略等你来")
+                .backgroundColor(Color.WHITE)
+                .inputRange(11, 11, Color.GRAY)
+                .inputType(InputType.TYPE_CLASS_NUMBER)
+                .canceledOnTouchOutside(false)
+                .negativeText("取消")
+                .positiveText("确定").onAny(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (DialogAction.POSITIVE == which) {
+                            dialog.dismiss();
+                            fixOpenwx();
+                        }
+                    }
+                }).build();
+        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams
+                .SOFT_INPUT_STATE_VISIBLE | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.show();
+    }
+
     private void showDialog() {
         MaterialDialog dialog = new MaterialDialog.Builder(MainActivity.this)
                 .title("绑定手机获取免费技能框")
@@ -661,6 +687,9 @@ public class MainActivity extends BaseActivity {
             LogUtil.msg("推测关注成功");
             if (currentGoodInfo != null) {
                 saveVip(currentGoodInfo.getIcon());
+                notifyDataSetChanged();
+                int count = PreferenceUtil.getImpl(this).getInt("WEIXIN_GZ", 0);
+                PreferenceUtil.getImpl(this).putInt("WEIXIN_GZ", ++count);
             }
         }
 

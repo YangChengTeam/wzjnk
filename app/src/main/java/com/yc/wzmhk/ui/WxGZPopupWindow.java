@@ -18,7 +18,6 @@ import com.yc.wzmhk.utils.AppUtil;
 public class WxGZPopupWindow extends BasePopupWindow {
     private TextView tvOpenWx;
 
-
     public WxGZPopupWindow(final Activity context) {
         super(context);
 
@@ -31,7 +30,9 @@ public class WxGZPopupWindow extends BasePopupWindow {
             @Override
             public void onClick(View v) {
                 MainActivity.getMainActivity().start();
-                AppUtil.copy(context, Config.WEIXIN);
+                if(MainActivity.getMainActivity().isCopyWeiXin()) {
+                    AppUtil.copy(context, Config.WEIXIN);
+                }
                 AppUtil.gotoWeiXin(context, "公众号已复制，正在前往微信");
                 MobclickAgent.onEvent(context, "king", "点击打开微信关注");
             }

@@ -29,6 +29,15 @@ public class LoginDataInfo {
     private List<VipInfo> vipInfoList;
 
     private int is_close_gzh;
+    private String gzh;
+
+    public String getGzh() {
+        return gzh;
+    }
+
+    public void setGzh(String gzh) {
+        this.gzh = gzh;
+    }
 
     public int getIs_close_gzh() {
         return is_close_gzh;

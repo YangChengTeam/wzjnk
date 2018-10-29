@@ -1,14 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 25
+    buildToolsVersion '27.0.3'
     defaultConfig {
-        applicationId "com.yc.kkds"
+        applicationId "com.yc.wzjnk"
         minSdkVersion 17
-        targetSdkVersion 27
-        versionCode 34
-        versionName "5.1.4W"
+        targetSdkVersion 25
+        versionCode 36
+        versionName "5.1.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         defaultConfig {
@@ -28,16 +28,16 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file('lykds2.jks')
+            storeFile file('wzjnk.jks')
             storePassword "123456"
-            keyAlias "lykds"
+            keyAlias "wzjnk"
             keyPassword "123456"
         }
 
         release {
-            storeFile file('lykds2.jks')
+            storeFile file('wzjnk.jks')
             storePassword "123456"
-            keyAlias "lykds"
+            keyAlias "wzjnk"
             keyPassword "123456"
         }
     }

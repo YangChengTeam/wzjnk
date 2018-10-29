@@ -1,6 +1,7 @@
 package com.yc.wzmhk.helper;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.View;
@@ -25,6 +26,7 @@ import com.yc.wzmhk.domain.PaywayListInfo;
 import com.yc.wzmhk.engin.PaywayListEngin;
 import com.yc.wzmhk.ui.BasePopupWindow;
 import com.yc.wzmhk.ui.MainActivity;
+import com.yc.wzmhk.ui.PayPopupWindow;
 import com.yc.wzmhk.ui.RewardPopupWindow;
 import com.yc.wzmhk.ui.WxGZPopupWindow;
 import com.yc.wzmhk.utils.LogUtil;
@@ -55,6 +57,9 @@ public class PayHelper {
     private String alipayWay;
     private String wxpayWay;
     private String money = "6.66元";
+    private TextView tvPay;
+
+    private boolean isHasWzGz = true;
 
     private BasePopupWindow mBasePopupWindow;
 
@@ -73,13 +78,11 @@ public class PayHelper {
         ivWxGz = (ImageView) contextView.findViewById(R.id.iv_wxgz);
 
         tvMoney = (TextView) contextView.findViewById(R.id.tv_money);
-        final TextView tvPay = (TextView) contextView.findViewById(R.id.tv_pay);
+        tvPay = (TextView) contextView.findViewById(R.id.tv_pay);
 
         ivAliPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvPay.setText("立即支付");
-                tvMoney.setText(money);
                 selectAlPay();
             }
         });
@@ -87,8 +90,6 @@ public class PayHelper {
         ivWxPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvPay.setText("立即支付");
-                tvMoney.setText(money);
                 selectWxPay();
             }
         });
@@ -96,12 +97,11 @@ public class PayHelper {
         ivWxGz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tvPay.setText("立即关注");
-                tvMoney.setText("0.00元");
                 selectWxGz();
             }
         });
 
+        wxGzSelected(context);
 
         tvPay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,8 +139,7 @@ public class PayHelper {
                 } else if (payType == Config.WXGZ) {
 
                     mBasePopupWindow.dismiss();
-                    WxGZPopupWindow wxGZPopupWindow = new WxGZPopupWindow(context);
-                    wxGZPopupWindow.show(context.getWindow().getDecorView().getRootView());
+                    MainActivity.getMainActivity().fixOpenwx();
                     return;
                 }
                 iPayAbs.pay(orderParamsInfo, callback);
@@ -198,8 +197,17 @@ public class PayHelper {
     private boolean hasWxPay = false;
     private boolean hasAliPay = false;
 
-    private void setPayway(ResultInfo<PaywayListInfo> resultInfo) {
+    private void wxGzSelected(Context context){
+        int count = PreferenceUtil.getImpl(context).getInt("WEIXIN_GZ", 0);
+        if(count > 0){
+            isHasWzGz = false;
+            ivWxGz.setClickable(false);
+            ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap
+                    .wxpay_gz_select_enable));
+        }
+    }
 
+    private void setPayway(ResultInfo<PaywayListInfo> resultInfo) {
         for (PayWayInfo payWayInfo : resultInfo.data.getPayWayInfos()) {
             if (payWayInfo != null && payWayInfo.getName() != null) {
                 String payway = payWayInfo.getName();
@@ -225,12 +233,22 @@ public class PayHelper {
             ivAliPay.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap
                     .no_alpay));
         }
+
+        if(!isHasWzGz){
+            ivWxGz.setClickable(false);
+            ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap
+                    .wxpay_gz_select_enable));
+        }
     }
 
 
     private void selectWxPay() {
         if (payType == Config.WXPAY) return;
-
+        tvPay.setText("立即支付");
+        tvMoney.setText(money);
+        if(mBasePopupWindow instanceof PayPopupWindow){
+            ((PayPopupWindow)mBasePopupWindow).vipClickableReset();
+        }
         payType = Config.WXPAY;
         if (hasAliPay) {
             ivAliPay.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.alipay_select));
@@ -238,13 +256,18 @@ public class PayHelper {
         if (hasWxPay) {
             ivWxPay.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_select_hover));
         }
-        ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_gz_select));
-
+        if(isHasWzGz) {
+            ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_gz_select));
+        }
     }
 
     private void selectWxGz() {
         if (payType == Config.WXGZ) return;
-
+        tvPay.setText("立即关注");
+        tvMoney.setText("0.00元");
+        if(mBasePopupWindow instanceof PayPopupWindow){
+            ((PayPopupWindow)mBasePopupWindow).goodSelected();
+        }
         payType = Config.WXGZ;
         ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_gz_select_hover));
         if (hasWxPay) {
@@ -257,7 +280,11 @@ public class PayHelper {
 
     private void selectAlPay() {
         if (payType == Config.ALIPAY) return;
-
+        tvPay.setText("立即支付");
+        tvMoney.setText(money);
+        if(mBasePopupWindow instanceof PayPopupWindow){
+            ((PayPopupWindow)mBasePopupWindow).vipClickableReset();
+        }
         payType = Config.ALIPAY;
         if (hasAliPay) {
             ivAliPay.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.alipay_select_hover));
@@ -265,8 +292,9 @@ public class PayHelper {
         if (hasWxPay) {
             ivWxPay.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_select));
         }
-        ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_gz_select));
-
+        if(isHasWzGz) {
+            ivWxGz.setImageDrawable(ContextCompat.getDrawable(mBasePopupWindow.getmContext(), R.mipmap.wxpay_gz_select));
+        }
     }
 
     //< 支付回调

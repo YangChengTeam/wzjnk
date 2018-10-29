@@ -10,8 +10,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/pay" />
-            <option value="$PROJECT_DIR$/process" />
-            <option value="$PROJECT_DIR$/setting" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

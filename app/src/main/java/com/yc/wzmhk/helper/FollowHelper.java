@@ -6,12 +6,7 @@ package com.yc.wzmhk.helper;
 
 public class FollowHelper {
     private long startTime;
-    private long defaultDiff = 10 * 1000;
-    private boolean followIng = false;
-
-    public boolean isFollowIng() {
-        return followIng;
-    }
+    private long defaultDiff = 20 * 1000;
 
     public FollowHelper(long diff) {
         this.defaultDiff = diff;
@@ -32,5 +27,15 @@ public class FollowHelper {
             return true;
         }
         return false;
+    }
+
+    public void setDefaultDiff(long defaultDiff) {
+        this.defaultDiff = defaultDiff;
+    }
+
+    private boolean followIng = false;
+
+    public boolean isFollowIng() {
+        return followIng;
     }
 }

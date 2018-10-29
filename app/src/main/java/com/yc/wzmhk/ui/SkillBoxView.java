@@ -123,7 +123,7 @@ public class SkillBoxView {
         mFloatLayout = (RelativeLayout) mInflater
                 .inflate(R.layout.view_float, null);
         mWindowManager.addView(mFloatLayout, originParams);
-        mFloatView = mFloatLayout.findViewById(R.id.iv_float);
+        mFloatView = (ImageView)mFloatLayout.findViewById(R.id.iv_float);
         showOff();
         mFloatView.setOnTouchListener(new View.OnTouchListener() {
             @Override
